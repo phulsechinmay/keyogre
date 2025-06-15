@@ -8,7 +8,6 @@ import AppKit
 @main
 struct KeyOgreApp: App {
     @StateObject private var keyEventTap = KeyEventTap()
-    @StateObject private var hotKeyManager = GlobalHotKeyManager()
     
     var body: some Scene {
         WindowGroup {
