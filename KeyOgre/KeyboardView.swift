@@ -75,16 +75,22 @@ struct KeyboardView: View {
             context.fill(glowPath, with: .color(theme.keyHighlight.opacity(0.3)))
         }
         
-        // Draw key legend
+        // Draw key legend (centered)
         if !key.legend.isEmpty {
             let fontSize = 12 * scale
-            let font = Font.system(size: fontSize, weight: .medium, design: .monospaced)
+            
+            // Use GraphicsContext's drawText method with proper positioning
+            let textPosition = CGPoint(
+                x: highlightFrame.midX,
+                y: highlightFrame.midY
+            )
             
             context.draw(
                 Text(key.legend)
-                    .font(font)
+                    .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundColor(theme.keyText),
-                in: highlightFrame
+                at: textPosition,
+                anchor: .center
             )
         }
     }
