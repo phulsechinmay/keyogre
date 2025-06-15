@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSInputMonitoringUsageDescription</key>
+	<string>KeyOgre needs to monitor keyboard input to show live key highlights and provide typing practice feedback. This helps you learn new keyboard layouts more effectively.</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -28,7 +32,5 @@
 	<string></string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
-	<key>NSInputMonitoringUsageDescription</key>
-	<string>KeyOgre needs to monitor keyboard input to show live key highlights and provide typing practice feedback. This helps you learn new keyboard layouts more effectively.</string>
 </dict>
 </plist>

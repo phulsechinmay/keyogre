@@ -26,46 +26,9 @@ struct KeyOgreApp: App {
     }
 }
 
-class GlobalHotKeyManager: ObservableObject {
-    private var eventMonitor: Any?
-    
-    func setupGlobalHotkey() {
-        // Monitor for global key events (⌃⌥K)
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-            if event.modifierFlags.contains([.control, .option]) && event.keyCode == 40 { // K key
-                DispatchQueue.main.async {
-                    self.toggleWindow()
-                }
-            }
-        }
-    }
-    
-    private func toggleWindow() {
-        if let window = NSApp.windows.first {
-            if window.isVisible {
-                window.orderOut(nil)
-            } else {
-                window.makeKeyAndOrderFront(nil)
-                NSApp.activate(ignoringOtherApps: true)
-            }
-        }
-    }
-    
-    func cleanup() {
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
-            eventMonitor = nil
-        }
-    }
-    
-    deinit {
-        cleanup()
-    }
-}
 
 struct ContentView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
-    @StateObject private var hotKeyManager = GlobalHotKeyManager()
     
     var body: some View {
         VStack(spacing: 20) {
@@ -76,14 +39,12 @@ struct ContentView: View {
                 .environmentObject(keyEventTap)
         }
         .padding()
-        .frame(width: 800, height: 400)
+        .frame(width: 800, height: 500) // Increased height for text field
         .onAppear {
             keyEventTap.startMonitoring()
-            hotKeyManager.setupGlobalHotkey()
         }
         .onDisappear {
             keyEventTap.stopMonitoring()
-            hotKeyManager.cleanup()
         }
     }
 }
