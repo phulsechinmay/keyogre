@@ -1,6 +1,7 @@
 # Xcode
 *.DS_Store
 todos.md
+CLAUDE.md
 
 ## Build generated
 build/
