@@ -6,7 +6,7 @@ import Combine
 
 struct KeyboardView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
-    @StateObject private var keyboardLayout = KeyboardLayout()
+    @StateObject private var keyboardLayout = ANSI60KeyboardLayout(withColors: true)
     @State private var highlightedKeyCode: CGKeyCode?
     @State private var cancellables = Set<AnyCancellable>()
     
@@ -63,7 +63,14 @@ struct KeyboardView: View {
         
         // Draw key background
         let path = Path(roundedRect: highlightFrame, cornerRadius: 6 * scale)
-        let backgroundColor = isHighlighted ? theme.keyHighlight : theme.keyBackground
+        let backgroundColor: Color
+        if isHighlighted {
+            backgroundColor = theme.keyHighlight
+        } else if key.backgroundColor != .clear {
+            backgroundColor = key.backgroundColor
+        } else {
+            backgroundColor = theme.keyBackground
+        }
         context.fill(path, with: .color(backgroundColor))
         
         // Draw key border
@@ -75,18 +82,47 @@ struct KeyboardView: View {
             context.fill(glowPath, with: .color(theme.keyHighlight.opacity(0.3)))
         }
         
-        // Draw key legend (centered)
-        if !key.legend.isEmpty {
-            let fontSize = 12 * scale
+        // Draw key legends
+        let fontSize = 12 * scale
+        
+        if let shiftLegend = key.shiftLegend {
+            // Draw dual labels: shift legend on top, base legend on bottom
+            let topPosition = CGPoint(
+                x: highlightFrame.midX,
+                y: highlightFrame.midY - highlightFrame.height * 0.15
+            )
             
-            // Use GraphicsContext's drawText method with proper positioning
+            let bottomPosition = CGPoint(
+                x: highlightFrame.midX,
+                y: highlightFrame.midY + highlightFrame.height * 0.15
+            )
+            
+            // Draw shift legend (top)
+            context.draw(
+                Text(shiftLegend)
+                    .font(.system(size: fontSize * 0.8, weight: .medium, design: .monospaced))
+                    .foregroundColor(theme.keyText),
+                at: topPosition,
+                anchor: .center
+            )
+            
+            // Draw base legend (bottom)
+            context.draw(
+                Text(key.baseLegend)
+                    .font(.system(size: fontSize, weight: .medium, design: .monospaced))
+                    .foregroundColor(theme.keyText),
+                at: bottomPosition,
+                anchor: .center
+            )
+        } else if !key.baseLegend.isEmpty {
+            // Draw single legend (centered)
             let textPosition = CGPoint(
                 x: highlightFrame.midX,
                 y: highlightFrame.midY
             )
             
             context.draw(
-                Text(key.legend)
+                Text(key.baseLegend)
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundColor(theme.keyText),
                 at: textPosition,
