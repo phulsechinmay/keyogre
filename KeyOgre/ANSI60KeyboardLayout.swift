@@ -13,8 +13,8 @@ class ANSI60KeyboardLayout: ObservableObject {
         // ANSI 60% layout dimensions and positioning
         let keyWidth: CGFloat = 40
         let keyHeight: CGFloat = 40
-        let keySpacing: CGFloat = 4
-        let rowSpacing: CGFloat = 4
+        let keySpacing: CGFloat = 2
+        let rowSpacing: CGFloat = 2
         
         var keys: [Key] = []
         

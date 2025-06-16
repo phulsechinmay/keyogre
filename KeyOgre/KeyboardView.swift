@@ -15,7 +15,7 @@ struct KeyboardView: View {
     var body: some View {
         ZStack {
             theme.windowBackground
-                .cornerRadius(12)
+                .cornerRadius(8)
             
             Canvas { context, size in
                 // Scale the layout to fit the available space
@@ -62,7 +62,7 @@ struct KeyboardView: View {
         )
         
         // Draw key background
-        let path = Path(roundedRect: highlightFrame, cornerRadius: 6 * scale)
+        let path = Path(roundedRect: highlightFrame, cornerRadius: 2 * scale)
         let backgroundColor: Color
         if isHighlighted {
             backgroundColor = theme.keyHighlight
@@ -74,11 +74,11 @@ struct KeyboardView: View {
         context.fill(path, with: .color(backgroundColor))
         
         // Draw key border
-        context.stroke(path, with: .color(theme.keyBorder), lineWidth: 1)
+        context.stroke(path, with: .color(theme.keyBorder), lineWidth: 0.5)
         
         // Draw glow effect when highlighted
         if isHighlighted {
-            let glowPath = Path(roundedRect: highlightFrame.insetBy(dx: -2, dy: -2), cornerRadius: 8 * scale)
+            let glowPath = Path(roundedRect: highlightFrame.insetBy(dx: -2, dy: -2), cornerRadius: 3 * scale)
             context.fill(glowPath, with: .color(theme.keyHighlight.opacity(0.3)))
         }
         
