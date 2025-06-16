@@ -43,8 +43,8 @@ struct LastTenView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(theme.windowBackground)
-                .stroke(theme.keyBorder.opacity(0.5), lineWidth: 1)
+                .fill(theme.keyBackground.opacity(0.7))
+                .stroke(theme.keyBorder, lineWidth: 1)
         )
         .onAppear {
             keyEventTap.lastTenCharacters

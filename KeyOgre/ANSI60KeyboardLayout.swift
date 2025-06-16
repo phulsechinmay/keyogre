@@ -18,22 +18,22 @@ class ANSI60KeyboardLayout: ObservableObject {
         
         var keys: [Key] = []
         
-        // Column colors based on the screenshot
+        // Column colors enhanced for translucent background visibility
         let columnColors: [Color] = [
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 0: Light green
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 1: Light green
-            Color(red: 0.9, green: 0.85, blue: 0.6),  // Column 2: Yellow
-            Color(red: 0.85, green: 0.7, blue: 0.5),  // Column 3: Orange
-            Color(red: 0.75, green: 0.75, blue: 0.75), // Column 4: Gray
-            Color(red: 0.85, green: 0.65, blue: 0.65), // Column 5: Pink/Red
-            Color(red: 0.85, green: 0.65, blue: 0.65), // Column 6: Pink/Red
-            Color(red: 0.9, green: 0.85, blue: 0.6),  // Column 7: Yellow
-            Color(red: 0.9, green: 0.85, blue: 0.6),  // Column 8: Yellow
-            Color(red: 0.85, green: 0.7, blue: 0.5),  // Column 9: Orange
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 10: Light green
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 11: Light green
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 12: Light green
-            Color(red: 0.7, green: 0.8, blue: 0.7),   // Column 13: Light green (backspace)
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 0: Light green
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 1: Light green
+            Color(red: 0.85, green: 0.8, blue: 0.45, opacity: 0.8),  // Column 2: Yellow
+            Color(red: 0.8, green: 0.6, blue: 0.35, opacity: 0.8),   // Column 3: Orange
+            Color(red: 0.65, green: 0.65, blue: 0.7, opacity: 0.8),  // Column 4: Gray
+            Color(red: 0.8, green: 0.5, blue: 0.5, opacity: 0.8),    // Column 5: Pink/Red
+            Color(red: 0.8, green: 0.5, blue: 0.5, opacity: 0.8),    // Column 6: Pink/Red
+            Color(red: 0.85, green: 0.8, blue: 0.45, opacity: 0.8),  // Column 7: Yellow
+            Color(red: 0.85, green: 0.8, blue: 0.45, opacity: 0.8),  // Column 8: Yellow
+            Color(red: 0.8, green: 0.6, blue: 0.35, opacity: 0.8),   // Column 9: Orange
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 10: Light green
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 11: Light green
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 12: Light green
+            Color(red: 0.6, green: 0.75, blue: 0.6, opacity: 0.8),   // Column 13: Light green (backspace)
         ]
         
         // Row 0: Number row with dual labels
@@ -157,10 +157,10 @@ class ANSI60KeyboardLayout: ObservableObject {
         let cmdColor = withColors ? columnColors[2] : .clear
         keys.append(Key(keyCode: 55, legend: "⌘", frame: cmdFrame, row: 4, column: 2, backgroundColor: cmdColor))
         
-        // Spacebar - spanning multiple columns, use the red/pink color
+        // Spacebar - spanning multiple columns, use enhanced red/pink color
         let spaceX = keyWidth * 3.75 + 3 * keySpacing
         let spaceFrame = CGRect(x: spaceX, y: bottomRowY, width: keyWidth * 6, height: keyHeight)
-        let spaceColor = withColors ? Color(red: 0.85, green: 0.65, blue: 0.65) : .clear
+        let spaceColor = withColors ? Color(red: 0.8, green: 0.5, blue: 0.5, opacity: 0.8) : .clear
         keys.append(Key(keyCode: 49, legend: "", frame: spaceFrame, row: 4, column: 3, backgroundColor: spaceColor))
         
         // Right Command, Option, Control
