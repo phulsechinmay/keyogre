@@ -32,6 +32,19 @@
 4. Add snapshot tests for key highlighting
 5. Ensure global hotkey toggle works properly
 
+### 2025-06-15 20:42 - Enhanced Testing & Visual Improvements
+- **Enhanced Key Structure**: Updated Key struct to support dual labels (base + shift symbols) and individual key colors
+- **ANSI60KeyboardLayout**: Created dedicated layout class matching reference screenshot:
+  - Column-based color scheme with muted pastels (green, yellow, orange, gray, pink)
+  - Dual-label keys showing shift symbols on top, base symbols on bottom
+  - Proper key positioning with tighter spacing (2px vs 4px) and smaller corner radius (2px)
+- **Comprehensive Unit Tests**: Added full test suite with 3 test files:
+  - `ANSI60KeyboardLayoutTests.swift` - Layout structure, key distribution, color validation
+  - `KeyEventTapTests.swift` - Publisher behavior, monitoring lifecycle, protocol conformance
+  - `KeyStructTests.swift` - Key initialization, dual labels, equality, frame properties
+- **Visual Polish**: Updated keyboard rendering to match screenshot with smaller corner radius and tighter key grouping
+- **Swift 6 Compatibility**: Fixed protocol references and type checking for modern Swift
+
 ### Future Milestones Planning
 - M2: Typing practice with accuracy tracking and WPM calculation
 - M3: UX polish with slide animations and theme selection

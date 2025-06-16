@@ -1,5 +1,6 @@
 # Xcode
 *.DS_Store
+todos.md
 
 ## Build generated
 build/
