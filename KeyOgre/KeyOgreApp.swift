@@ -16,6 +16,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupMenuBarApp()
         setupGlobalHotkey()
         
+        // Creating window from AppDelegate is necessary for it to show up 
+        // as overlay on fullscreen apps
+        // https://stackoverflow.com/questions/79153578/keeping-swiftui-window-on-top-of-all-other-apps-even-in-fullscreen
+        dropdownManager.createOverlayWindow(keyEventTap: keyEventTap)
+        
         // Show the dropdown window on startup
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self = self else { return }
