@@ -1,0 +1,16 @@
+PODS:
+  - KeyboardShortcuts (0.7.1)
+
+DEPENDENCIES:
+  - KeyboardShortcuts
+
+SPEC REPOS:
+  trunk:
+    - KeyboardShortcuts
+
+SPEC CHECKSUMS:
+  KeyboardShortcuts: de68625ae0471476fa92dc363a341f4981b29947
+
+PODFILE CHECKSUM: 024f6f6ae7c987061e56bb2ef6b502ae9cc5e68a
+
+COCOAPODS: 1.16.2

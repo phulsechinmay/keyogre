@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1046552BD0783223DA800E80 /* Pods_KeyOgre.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54135A110C0796549E3BD6DB /* Pods_KeyOgre.framework */; };
+		57DE0B10DB64BDAE8D5E7E5D /* Pods_KeyOgreTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12F31FD1C7D052326FB1AB32 /* Pods_KeyOgreTests.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B3CE7AF22DFF3E20004A5A28 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,9 +29,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		12F31FD1C7D052326FB1AB32 /* Pods_KeyOgreTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KeyOgreTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		54135A110C0796549E3BD6DB /* Pods_KeyOgre.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KeyOgre.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E9492A0C66ABE59EF2883ED /* Pods-KeyOgreTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeyOgreTests.debug.xcconfig"; path = "Target Support Files/Pods-KeyOgreTests/Pods-KeyOgreTests.debug.xcconfig"; sourceTree = "<group>"; };
+		93B728D4058BE946AFA2E26A /* Pods-KeyOgre.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeyOgre.debug.xcconfig"; path = "Target Support Files/Pods-KeyOgre/Pods-KeyOgre.debug.xcconfig"; sourceTree = "<group>"; };
 		B3CE7AE32DFF3E1F004A5A28 /* KeyOgre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeyOgre.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CE7AF12DFF3E20004A5A28 /* KeyOgreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyOgreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CE7AFB2DFF3E20004A5A28 /* KeyOgreUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyOgreUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC08347B3310B19E27D43073 /* Pods-KeyOgreTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeyOgreTests.release.xcconfig"; path = "Target Support Files/Pods-KeyOgreTests/Pods-KeyOgreTests.release.xcconfig"; sourceTree = "<group>"; };
+		FFD6016537BE7C7CDE51115C /* Pods-KeyOgre.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KeyOgre.release.xcconfig"; path = "Target Support Files/Pods-KeyOgre/Pods-KeyOgre.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1046552BD0783223DA800E80 /* Pods_KeyOgre.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57DE0B10DB64BDAE8D5E7E5D /* Pods_KeyOgreTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +85,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2618A01CAC8396AA19931572 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54135A110C0796549E3BD6DB /* Pods_KeyOgre.framework */,
+				12F31FD1C7D052326FB1AB32 /* Pods_KeyOgreTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		84E5D66C9938237CA8FCCD4B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				93B728D4058BE946AFA2E26A /* Pods-KeyOgre.debug.xcconfig */,
+				FFD6016537BE7C7CDE51115C /* Pods-KeyOgre.release.xcconfig */,
+				6E9492A0C66ABE59EF2883ED /* Pods-KeyOgreTests.debug.xcconfig */,
+				BC08347B3310B19E27D43073 /* Pods-KeyOgreTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		B3CE7ADA2DFF3E1F004A5A28 = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +112,8 @@
 				B3CE7AF42DFF3E20004A5A28 /* KeyOgreTests */,
 				B3CE7AFE2DFF3E20004A5A28 /* KeyOgreUITests */,
 				B3CE7AE42DFF3E1F004A5A28 /* Products */,
+				84E5D66C9938237CA8FCCD4B /* Pods */,
+				2618A01CAC8396AA19931572 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,9 +134,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B3CE7B052DFF3E20004A5A28 /* Build configuration list for PBXNativeTarget "KeyOgre" */;
 			buildPhases = (
+				05CC90F3FE083435383D5B8C /* [CP] Check Pods Manifest.lock */,
 				B3CE7ADF2DFF3E1F004A5A28 /* Sources */,
 				B3CE7AE02DFF3E1F004A5A28 /* Frameworks */,
 				B3CE7AE12DFF3E1F004A5A28 /* Resources */,
+				23AAE53C53D3D637FE807E7B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -111,8 +148,6 @@
 				B3CE7AE52DFF3E1F004A5A28 /* KeyOgre */,
 			);
 			name = KeyOgre;
-			packageProductDependencies = (
-			);
 			productName = KeyOgre;
 			productReference = B3CE7AE32DFF3E1F004A5A28 /* KeyOgre.app */;
 			productType = "com.apple.product-type.application";
@@ -121,6 +156,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B3CE7B082DFF3E20004A5A28 /* Build configuration list for PBXNativeTarget "KeyOgreTests" */;
 			buildPhases = (
+				3964F63FB51D6E33D1F4E280 /* [CP] Check Pods Manifest.lock */,
 				B3CE7AED2DFF3E20004A5A28 /* Sources */,
 				B3CE7AEE2DFF3E20004A5A28 /* Frameworks */,
 				B3CE7AEF2DFF3E20004A5A28 /* Resources */,
@@ -134,8 +170,6 @@
 				B3CE7AF42DFF3E20004A5A28 /* KeyOgreTests */,
 			);
 			name = KeyOgreTests;
-			packageProductDependencies = (
-			);
 			productName = KeyOgreTests;
 			productReference = B3CE7AF12DFF3E20004A5A28 /* KeyOgreTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,8 +191,6 @@
 				B3CE7AFE2DFF3E20004A5A28 /* KeyOgreUITests */,
 			);
 			name = KeyOgreUITests;
-			packageProductDependencies = (
-			);
 			productName = KeyOgreUITests;
 			productReference = B3CE7AFB2DFF3E20004A5A28 /* KeyOgreUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -230,6 +262,74 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		05CC90F3FE083435383D5B8C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KeyOgre-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		23AAE53C53D3D637FE807E7B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KeyOgre/Pods-KeyOgre-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KeyOgre/Pods-KeyOgre-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KeyOgre/Pods-KeyOgre-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3964F63FB51D6E33D1F4E280 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KeyOgreTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B3CE7ADF2DFF3E1F004A5A28 /* Sources */ = {
@@ -306,7 +406,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -369,7 +469,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -389,6 +489,7 @@
 		};
 		B3CE7B062DFF3E20004A5A28 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 93B728D4058BE946AFA2E26A /* Pods-KeyOgre.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -415,6 +516,7 @@
 		};
 		B3CE7B072DFF3E20004A5A28 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FFD6016537BE7C7CDE51115C /* Pods-KeyOgre.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -441,6 +543,7 @@
 		};
 		B3CE7B092DFF3E20004A5A28 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6E9492A0C66ABE59EF2883ED /* Pods-KeyOgreTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -458,6 +561,7 @@
 		};
 		B3CE7B0A2DFF3E20004A5A28 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BC08347B3310B19E27D43073 /* Pods-KeyOgreTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;

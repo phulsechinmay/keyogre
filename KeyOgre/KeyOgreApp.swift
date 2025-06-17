@@ -4,12 +4,13 @@
 import SwiftUI
 import Combine
 import AppKit
+import KeyboardShortcuts
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let keyEventTap = KeyEventTap()
     private let dropdownManager = DropdownWindowManager()
-    private var globalHotkeyMonitor: Any?
-    private var localHotkeyMonitor: Any?
+    private let keyboardShortcutsManager = KeyboardShortcutsManager.shared
+    private var isWindowVisible = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBarApp()
@@ -17,7 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Show the dropdown window on startup
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.dropdownManager.showDropdown(keyEventTap: self?.keyEventTap ?? KeyEventTap())
+            guard let self = self else { return }
+            self.showWindow()
         }
     }
     
@@ -27,40 +29,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func setupGlobalHotkey() {
-        print("KeyOgre: Setting up hotkey monitors...")
+        print("KeyOgre: Setting up KeyboardShortcuts global hotkey...")
         
-        // Helper function to handle hotkey detection
-        func handleHotkeyEvent(_ event: NSEvent, source: String) {
-            let char = event.charactersIgnoringModifiers ?? ""
-            print("KeyOgre: [\(source)] Key event - keyCode: \(event.keyCode), char: '\(char)', modifiers: \(event.modifierFlags)")
-            
-            // Check for Command+` (try multiple key codes for backtick)
-            let isCommandPressed = event.modifierFlags.contains(.command)
-            let isBacktickKey = event.keyCode == 50 || char == "`" || char == "~"
-            
-            print("KeyOgre: [\(source)] Command pressed: \(isCommandPressed), Backtick key: \(isBacktickKey)")
-            
-            if isCommandPressed && isBacktickKey {
-                print("KeyOgre: [\(source)] 🎯 Command+` hotkey detected! Toggling dropdown...")
-                DispatchQueue.main.async {
-                    self.dropdownManager.toggleDropdown(keyEventTap: self.keyEventTap)
-                }
-            }
+        // Log debug info first
+        keyboardShortcutsManager.logDebugInfo()
+        
+        // Setup the global hotkey
+        keyboardShortcutsManager.setupGlobalHotkey { [weak self] in
+            guard let self = self else { return }
+            print("KeyOgre: 🎯 KeyboardShortcuts hotkey triggered! Toggling dropdown...")
+            self.toggleWindow()
         }
         
-        // Setup global hotkey monitor (for when app is not in focus)
-        globalHotkeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
-            handleHotkeyEvent(event, source: "GLOBAL")
+        // Log final status
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.keyboardShortcutsManager.logDebugInfo()
         }
-        
-        // Setup local hotkey monitor (for when app is in focus)
-        localHotkeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            handleHotkeyEvent(event, source: "LOCAL")
-            return event // Return the event to allow normal processing
-        }
-        
-        print("KeyOgre: Global monitor: \(globalHotkeyMonitor != nil ? "✅" : "❌")")
-        print("KeyOgre: Local monitor: \(localHotkeyMonitor != nil ? "✅" : "❌")")
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -70,13 +54,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        print("KeyOgre: App terminating, cleaning up monitors")
-        if let monitor = globalHotkeyMonitor {
-            NSEvent.removeMonitor(monitor)
+        print("KeyOgre: App terminating, cleaning up KeyboardShortcuts")
+        keyboardShortcutsManager.removeGlobalHotkey()
+    }
+    
+    // MARK: - Window Management
+    private func toggleWindow() {
+        if isWindowVisible {
+            hideWindow()
+        } else {
+            showWindow()
         }
-        if let monitor = localHotkeyMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
+    }
+    
+    private func showWindow() {
+        dropdownManager.showDropdown(keyEventTap: keyEventTap)
+        isWindowVisible = true
+        
+        // Activate app to bring it to front
+        NSApp.activate(ignoringOtherApps: true)
+        print("KeyOgre: Window shown and app activated")
+    }
+    
+    private func hideWindow() {
+        dropdownManager.hideDropdown()
+        isWindowVisible = false
+        print("KeyOgre: Window hidden")
     }
 }
 
