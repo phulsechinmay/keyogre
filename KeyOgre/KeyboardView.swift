@@ -13,11 +13,7 @@ struct KeyboardView: View {
     private let theme = ColorTheme.defaultTheme
     
     var body: some View {
-        ZStack {
-            theme.windowBackground
-                .cornerRadius(8)
-            
-            Canvas { context, size in
+        Canvas { context, size in
                 // Scale the layout to fit the available space
                 let scale = min(size.width / keyboardLayout.totalSize.width, 
                                size.height / keyboardLayout.totalSize.height) * 0.9
@@ -36,7 +32,6 @@ struct KeyboardView: View {
                     drawKey(context: context, key: key, frame: scaledFrame, scale: scale)
                 }
             }
-        }
         .onAppear {
             keyEventTap.currentKeyCode
                 .receive(on: DispatchQueue.main)

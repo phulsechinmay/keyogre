@@ -47,7 +47,7 @@ struct ColorTheme {
         keyHighlight: Color(red: 0.25, green: 0.35, blue: 0.55, opacity: 0.95),
         keyBorder: Color(red: 0.45, green: 0.45, blue: 0.5, opacity: 0.8),
         keyText: Color(red: 0.9, green: 0.9, blue: 0.95, opacity: 0.95),
-        windowBackground: Color(red: 0.1, green: 0.1, blue: 0.12, opacity: 0.5),
+        windowBackground: Color(red: 0.29, green: 0.33, blue: 0.41, opacity: 0.7),
         name: "Translucent Dark"
     )
     
@@ -61,5 +61,5 @@ struct ColorTheme {
         name: "High Contrast"
     )
     
-    static let defaultTheme = translucentLight
+    static let defaultTheme = translucentDark
 }
