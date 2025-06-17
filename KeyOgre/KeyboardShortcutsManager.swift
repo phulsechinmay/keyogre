@@ -49,15 +49,20 @@ class KeyboardShortcutsManager: ObservableObject {
             #endif
         }
         
-        // Set up listener
+        // Set up listener with explicit options for fullscreen app compatibility
         KeyboardShortcuts.onKeyDown(for: .toggleKeyOgre) { [weak self] in
             self?.logger.info("🎯 Global hotkey triggered!")
             #if DEBUG
             print("[KeyOgre] 🎯 Global hotkey triggered!")
             #endif
             
-            DispatchQueue.main.async {
+            // Force main thread execution immediately for fullscreen app compatibility
+            if Thread.isMainThread {
                 action()
+            } else {
+                DispatchQueue.main.sync {
+                    action()
+                }
             }
         }
         
