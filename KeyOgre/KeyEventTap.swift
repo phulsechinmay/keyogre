@@ -17,20 +17,27 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     let lastTenCharacters = CurrentValueSubject<[Character], Never>([])
     
     private var localMonitor: Any?
+    private var flagsMonitor: Any?
     private var characterBuffer: [Character] = []
     
     func startMonitoring() {
         print("KeyOgre: Starting local key monitoring...")
         
-        // Local monitor for when the app has focus
+        // Local monitor for regular keys when the app has focus
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             self.handleSimpleKeyEvent(event: event, source: "LOCAL")
             return event
         }
         
-        if localMonitor != nil {
-            print("KeyOgre: ✅ Local key monitor started (captures keys when app has focus)")
-            print("KeyOgre: Try typing in the text field above!")
+        // Local monitor for modifier key changes
+        flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+            self.handleModifierKeyEvent(event: event, source: "LOCAL")
+            return event
+        }
+        
+        if localMonitor != nil && flagsMonitor != nil {
+            print("KeyOgre: ✅ Local key monitor started (captures keys and modifiers when app has focus)")
+            print("KeyOgre: Try typing or pressing modifier keys!")
         } else {
             print("KeyOgre: ❌ Failed to start local key monitor")
         }
@@ -42,7 +49,13 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         if let local = localMonitor {
             NSEvent.removeMonitor(local)
             localMonitor = nil
-            print("KeyOgre: ✅ Local monitor stopped")
+            print("KeyOgre: ✅ Local key monitor stopped")
+        }
+        
+        if let flags = flagsMonitor {
+            NSEvent.removeMonitor(flags)
+            flagsMonitor = nil
+            print("KeyOgre: ✅ Local flags monitor stopped")
         }
     }
     
@@ -63,6 +76,31 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             // Clear highlight after animation duration
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 self.currentKeyCode.send(nil)
+            }
+        }
+    }
+    
+    private func handleModifierKeyEvent(event: NSEvent, source: String) {
+        let newFlags = event.modifierFlags
+        let keyCode = UInt16(event.keyCode)
+        
+        let changedFlags = NSEvent.ModifierFlags(rawValue: newFlags.rawValue)
+        
+        // Map modifier flags to key codes based on ANSI60KeyboardLayout
+        let modifierKeyCode: CGKeyCode? = CGKeyCode(keyCode)
+        
+        // Check if a modifier was pressed (not released)
+        let wasPressed = newFlags.intersection(changedFlags).rawValue != 0
+        
+        if let keyCode = modifierKeyCode, wasPressed {
+            // Update the published values
+            DispatchQueue.main.async {
+                self.currentKeyCode.send(keyCode)
+                
+                // Clear highlight after animation duration
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    self.currentKeyCode.send(nil)
+                }
             }
         }
     }
