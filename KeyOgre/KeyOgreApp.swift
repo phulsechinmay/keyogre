@@ -39,6 +39,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Log debug info first
         keyboardShortcutsManager.logDebugInfo()
         
+        // Reset to new default (Command + backtick) to override any cached old shortcut
+        keyboardShortcutsManager.resetToDefaultShortcut()
+        
         // Setup the global hotkey
         keyboardShortcutsManager.setupGlobalHotkey { [weak self] in
             guard let self = self else { return }

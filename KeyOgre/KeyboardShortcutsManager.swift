@@ -7,7 +7,7 @@ import os.log
 
 // MARK: - Shortcut Definitions
 extension KeyboardShortcuts.Name {
-    static let toggleKeyOgre = Self("toggleKeyOgre", default: .init(.k, modifiers: [.control, .option]))
+    static let toggleKeyOgre = Self("toggleKeyOgre", default: .init(.backtick, modifiers: [.command]))
 }
 
 // MARK: - KeyboardShortcuts Manager
