@@ -54,8 +54,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationWillTerminate(_ notification: Notification) {
-        print("KeyOgre: App terminating, cleaning up KeyboardShortcuts")
+        print("KeyOgre: App terminating, cleaning up KeyboardShortcuts and KeyEventTap")
         keyboardShortcutsManager.removeGlobalHotkey()
+        keyEventTap.stopMonitoring()
     }
     
     // MARK: - Window Management
@@ -68,6 +69,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func showWindow() {
+        // Start key monitoring when showing window
+        keyEventTap.startMonitoring()
+        
         dropdownManager.showDropdown(keyEventTap: keyEventTap)
         isWindowVisible = true
         
@@ -77,6 +81,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func hideWindow() {
+        // Stop key monitoring when hiding window
+        keyEventTap.stopMonitoring()
+        
         dropdownManager.hideDropdown()
         isWindowVisible = false
         print("KeyOgre: Window hidden")

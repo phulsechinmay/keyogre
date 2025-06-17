@@ -178,11 +178,5 @@ struct DropdownContentView: View {
                 .fill(theme.windowBackground)
         )
         .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-        .onAppear {
-            keyEventTap.startMonitoring()
-        }
-        .onDisappear {
-            keyEventTap.stopMonitoring()
-        }
     }
 }
