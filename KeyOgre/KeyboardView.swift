@@ -7,13 +7,14 @@ import Combine
 struct KeyboardView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
     @StateObject private var keyboardLayout = ANSI60KeyboardLayout(withColors: true)
-    @State private var highlightedKeyCode: CGKeyCode?
     @State private var cancellables = Set<AnyCancellable>()
+    @State private var refreshTrigger = false
     
     private let theme = ColorTheme.defaultTheme
     
     var body: some View {
         Canvas { context, size in
+                let _ = refreshTrigger // Force dependency on refresh trigger
                 // Scale the layout to fit the available space
                 let scale = min(size.width / keyboardLayout.totalSize.width, 
                                size.height / keyboardLayout.totalSize.height) * 0.9
@@ -33,11 +34,12 @@ struct KeyboardView: View {
                 }
             }
         .onAppear {
-            keyEventTap.currentKeyCode
+            keyEventTap.pressedKeysSet
                 .receive(on: DispatchQueue.main)
-                .sink { keyCode in
+                .sink { _ in
+                    // Trigger view update with animation when pressed keys change
                     withAnimation(.easeOut(duration: 0.15)) {
-                        highlightedKeyCode = keyCode
+                        refreshTrigger.toggle()
                     }
                 }
                 .store(in: &cancellables)
@@ -45,7 +47,7 @@ struct KeyboardView: View {
     }
     
     private func drawKey(context: GraphicsContext, key: Key, frame: CGRect, scale: CGFloat) {
-        let isHighlighted = highlightedKeyCode == key.keyCode
+        let isHighlighted = keyEventTap.pressedKeysSet.value.contains(key.keyCode)
         let keyScale: CGFloat = isHighlighted ? 1.05 : 1.0
         
         // Calculate scaled frame for highlight effect

@@ -11,7 +11,7 @@ struct KeyEventTapTests {
     @Test func testInitialization() async throws {
         let keyEventTap = KeyEventTap()
         
-        #expect(keyEventTap.currentKeyCode.value == nil, "Initial key code should be nil")
+        #expect(keyEventTap.pressedKeysSet.value.isEmpty, "Initial pressed keys set should be empty")
         #expect(keyEventTap.lastTenCharacters.value.isEmpty, "Initial character buffer should be empty")
         
         // Clean up
@@ -24,7 +24,7 @@ struct KeyEventTapTests {
         // Verify it conforms to KeyEventTapProtocol
         let protocolInstance: any KeyEventTapProtocol = keyEventTap
         
-        #expect(protocolInstance.currentKeyCode.value == nil, "Protocol currentKeyCode should work")
+        #expect(protocolInstance.pressedKeysSet.value.isEmpty, "Protocol pressedKeysSet should work")
         #expect(protocolInstance.lastTenCharacters.value.isEmpty, "Protocol lastTenCharacters should work")
         
         // Clean up
@@ -70,41 +70,46 @@ struct KeyEventTapTests {
         keyEventTap.stopMonitoring()
     }
     
-    @Test func testKeyCodePublishing() async throws {
+    @Test func testPressedKeysSetPublishing() async throws {
         // Create a fresh instance for isolation
         let keyEventTap = KeyEventTap()
         
         // Ensure clean state - stop any existing monitoring
         keyEventTap.stopMonitoring()
         
-        var receivedKeyCodes: [CGKeyCode?] = []
+        var receivedKeysSets: [Set<CGKeyCode>] = []
         
         // Test initial state before subscribing
-        #expect(keyEventTap.currentKeyCode.value == nil, "Should start with nil")
+        #expect(keyEventTap.pressedKeysSet.value.isEmpty, "Should start with empty set")
         
-        let cancellable = keyEventTap.currentKeyCode
-            .sink { keyCode in
-                receivedKeyCodes.append(keyCode)
+        let cancellable = keyEventTap.pressedKeysSet
+            .sink { keysSet in
+                receivedKeysSets.append(keysSet)
             }
         
         // CurrentValueSubject should deliver initial value synchronously
-        #expect(receivedKeyCodes.count == 1, "Should receive initial value immediately")
-        #expect(receivedKeyCodes[0] == nil, "Initial value should be nil")
+        #expect(receivedKeysSets.count == 1, "Should receive initial value immediately")
+        #expect(receivedKeysSets[0].isEmpty, "Initial value should be empty set")
         
         // Simulate a key event (this would normally happen through NSEvent)
-        keyEventTap.currentKeyCode.send(CGKeyCode(18)) // Simulate '1' key
+        keyEventTap.pressedKeysSet.send([CGKeyCode(18)]) // Simulate '1' key pressed
         
         // The send should be synchronous too
-        #expect(receivedKeyCodes.count == 2, "Should receive exactly two values")
-        #expect(receivedKeyCodes[0] == nil, "First value should be nil")
-        #expect(receivedKeyCodes[1] == CGKeyCode(18), "Second value should be the sent key code")
-        #expect(keyEventTap.currentKeyCode.value == CGKeyCode(18), "Current value should be updated")
+        #expect(receivedKeysSets.count == 2, "Should receive exactly two values")
+        #expect(receivedKeysSets[0].isEmpty, "First value should be empty set")
+        #expect(receivedKeysSets[1] == [CGKeyCode(18)], "Second value should contain the sent key code")
+        #expect(keyEventTap.pressedKeysSet.value == [CGKeyCode(18)], "Current value should be updated")
         
-        // Send nil to clear
-        keyEventTap.currentKeyCode.send(nil)
-        #expect(receivedKeyCodes.count == 3, "Should receive three values")
-        #expect(receivedKeyCodes[2] == nil, "Third value should be nil")
-        #expect(keyEventTap.currentKeyCode.value == nil, "Current value should be nil again")
+        // Send multiple keys
+        keyEventTap.pressedKeysSet.send([CGKeyCode(18), CGKeyCode(19)])
+        #expect(receivedKeysSets.count == 3, "Should receive three values")
+        #expect(receivedKeysSets[2] == [CGKeyCode(18), CGKeyCode(19)], "Third value should contain both keys")
+        
+        // Send empty set to clear
+        keyEventTap.pressedKeysSet.send([])
+        #expect(receivedKeysSets.count == 4, "Should receive four values")
+        #expect(receivedKeysSets[3].isEmpty, "Fourth value should be empty set")
+        #expect(keyEventTap.pressedKeysSet.value.isEmpty, "Current value should be empty again")
         
         cancellable.cancel()
         keyEventTap.stopMonitoring()
@@ -136,8 +141,8 @@ struct KeyEventTapTests {
         let keyEventTap = KeyEventTap()
         
         // Verify the publishers are the correct types
-        #expect(type(of: keyEventTap.currentKeyCode) == CurrentValueSubject<CGKeyCode?, Never>.self, 
-               "currentKeyCode should be CurrentValueSubject<CGKeyCode?, Never>")
+        #expect(type(of: keyEventTap.pressedKeysSet) == CurrentValueSubject<Set<CGKeyCode>, Never>.self, 
+               "pressedKeysSet should be CurrentValueSubject<Set<CGKeyCode>, Never>")
         #expect(type(of: keyEventTap.lastTenCharacters) == CurrentValueSubject<[Character], Never>.self, 
                "lastTenCharacters should be CurrentValueSubject<[Character], Never>")
         
@@ -151,16 +156,16 @@ struct KeyEventTapTests {
         // Test that we can receive updates on main queue
         var receivedOnMainThread = false
         
-        let cancellable = keyEventTap.currentKeyCode
+        let cancellable = keyEventTap.pressedKeysSet
             .receive(on: DispatchQueue.main)
-            .sink { keyCode in
+            .sink { keysSet in
                 receivedOnMainThread = Thread.isMainThread
             }
         
         // Trigger an update from background queue
         await withCheckedContinuation { continuation in
             DispatchQueue.global().async {
-                keyEventTap.currentKeyCode.send(CGKeyCode(42))
+                keyEventTap.pressedKeysSet.send([CGKeyCode(42)])
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     continuation.resume()
                 }
@@ -173,28 +178,28 @@ struct KeyEventTapTests {
         keyEventTap.stopMonitoring()
     }
     
-    @Test func testKeyCodeClearingBehavior() async throws {
+    @Test func testPressedKeysSetClearingBehavior() async throws {
         let keyEventTap = KeyEventTap()
         
-        var keyCodeUpdates: [CGKeyCode?] = []
+        var keySetUpdates: [Set<CGKeyCode>] = []
         
-        let cancellable = keyEventTap.currentKeyCode
-            .sink { keyCode in
-                keyCodeUpdates.append(keyCode)
+        let cancellable = keyEventTap.pressedKeysSet
+            .sink { keysSet in
+                keySetUpdates.append(keysSet)
             }
         
-        // Test the sequence: nil -> keycode -> nil
-        #expect(keyEventTap.currentKeyCode.value == nil, "Should start with nil")
+        // Test the sequence: empty -> keys -> empty
+        #expect(keyEventTap.pressedKeysSet.value.isEmpty, "Should start with empty set")
         
-        keyEventTap.currentKeyCode.send(CGKeyCode(18))
-        #expect(keyEventTap.currentKeyCode.value == CGKeyCode(18), "Should have the sent key code")
+        keyEventTap.pressedKeysSet.send([CGKeyCode(18)])
+        #expect(keyEventTap.pressedKeysSet.value == [CGKeyCode(18)], "Should have the sent key code")
         
-        keyEventTap.currentKeyCode.send(nil)
-        #expect(keyEventTap.currentKeyCode.value == nil, "Should be cleared to nil")
+        keyEventTap.pressedKeysSet.send([])
+        #expect(keyEventTap.pressedKeysSet.value.isEmpty, "Should be cleared to empty set")
         
         // Verify we received the updates
         try await Task.sleep(nanoseconds: 50_000_000) // Brief delay for async updates
-        #expect(keyCodeUpdates.count >= 2, "Should have received multiple updates")
+        #expect(keySetUpdates.count >= 2, "Should have received multiple updates")
         
         cancellable.cancel()
         keyEventTap.stopMonitoring()

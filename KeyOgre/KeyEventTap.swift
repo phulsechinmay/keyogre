@@ -6,15 +6,15 @@ import Combine
 import AppKit
 
 protocol KeyEventTapProtocol: ObservableObject {
-    var currentKeyCode: CurrentValueSubject<CGKeyCode?, Never> { get }
     var lastTenCharacters: CurrentValueSubject<[Character], Never> { get }
+    var pressedKeysSet: CurrentValueSubject<Set<CGKeyCode>, Never> { get }
     func startMonitoring()
     func stopMonitoring()
 }
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
-    let currentKeyCode = CurrentValueSubject<CGKeyCode?, Never>(nil)
     let lastTenCharacters = CurrentValueSubject<[Character], Never>([])
+    let pressedKeysSet = CurrentValueSubject<Set<CGKeyCode>, Never>([])
     
     private var localMonitor: Any?
     private var keyUpMonitor: Any?
@@ -74,7 +74,7 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         
         // Clear any pressed keys when stopping
         pressedKeys.removeAll()
-        currentKeyCode.send(nil)
+        pressedKeysSet.send([])
     }
     
     private func handleKeyDownEvent(event: NSEvent, source: String) {
@@ -88,8 +88,8 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             // Add to pressed keys set
             self.pressedKeys.insert(keyCode)
             
-            // Update current highlighted key (for now, just show the most recent key)
-            self.currentKeyCode.send(keyCode)
+            // Publish the updated pressed keys set
+            self.pressedKeysSet.send(self.pressedKeys)
             
             // Add character to buffer
             if let char = character.first {
@@ -109,10 +109,8 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             // Remove from pressed keys set
             self.pressedKeys.remove(keyCode)
             
-            // If this was the currently highlighted key, clear the highlight
-            if self.currentKeyCode.value == keyCode {
-                self.currentKeyCode.send(nil)
-            }
+            // Publish the updated pressed keys set
+            self.pressedKeysSet.send(self.pressedKeys)
         }
     }
     
@@ -138,7 +136,7 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
                 
                 DispatchQueue.main.async {
                     self.pressedKeys.insert(keyCode)
-                    self.currentKeyCode.send(keyCode)
+                    self.pressedKeysSet.send(self.pressedKeys)
                 }
             } else if !isPressed && wasAlreadyPressed {
                 // Key was just released
@@ -147,9 +145,7 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
                 
                 DispatchQueue.main.async {
                     self.pressedKeys.remove(keyCode)
-                    if self.currentKeyCode.value == keyCode {
-                        self.currentKeyCode.send(nil)
-                    }
+                    self.pressedKeysSet.send(self.pressedKeys)
                 }
             }
         }
