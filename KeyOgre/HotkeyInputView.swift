@@ -1,0 +1,283 @@
+// ABOUTME: SwiftUI component for capturing and displaying custom keyboard shortcuts
+// ABOUTME: Allows users to set their preferred hotkey for toggling the KeyOgre overlay
+
+import SwiftUI
+import KeyboardShortcuts
+
+struct HotkeyInputView: View {
+    @ObservedObject private var keyboardShortcutsManager = KeyboardShortcutsManager.shared
+    @State private var isRecording = false
+    @State private var currentShortcut: KeyboardShortcuts.Shortcut?
+    @State private var eventMonitor: Any?
+    
+    private let theme = ColorTheme.defaultTheme
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Section header
+            HStack {
+                Text("Toggle Hotkey")
+                    .font(.headline)
+                    .foregroundColor(theme.keyText)
+                
+                Spacer()
+                
+                Button(action: resetToDefault) {
+                    Text("Reset")
+                        .font(.caption)
+                        .foregroundColor(theme.keyText.opacity(0.7))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(theme.keyBackground.opacity(0.5))
+                        )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Hotkey input area
+            HStack(spacing: 12) {
+                // Current hotkey display/input
+                Button(action: toggleRecording) {
+                    HStack(spacing: 8) {
+                        if isRecording {
+                            HStack(spacing: 6) {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
+                                
+                                Text("recording hotkey...")
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(theme.keyText.opacity(0.7))
+                                    .italic()
+                            }
+                        } else {
+                            shortcutDisplay
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: isRecording ? "stop.circle.fill" : "pencil")
+                            .font(.system(size: 14))
+                            .foregroundColor(theme.keyText.opacity(0.6))
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(isRecording ? theme.keyHighlight.opacity(0.3) : theme.keyBackground.opacity(0.8))
+                            .stroke(isRecording ? theme.keyHighlight : theme.keyBorder, lineWidth: 1)
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    if hovering {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
+                
+                // Instructions
+                Text(isRecording ? "Press any key combination" : "Click to change")
+                    .font(.caption)
+                    .foregroundColor(theme.keyText.opacity(0.5))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(theme.windowBackground.opacity(0.3))
+        )
+        .onAppear {
+            loadCurrentShortcut()
+        }
+        .onDisappear {
+            stopRecording()
+        }
+    }
+    
+    private var shortcutDisplay: some View {
+        HStack(spacing: 4) {
+            if let shortcut = currentShortcut {
+                // Display modifier symbols
+                if shortcut.modifiers.contains(.control) {
+                    modifierSymbol("⌃")
+                }
+                if shortcut.modifiers.contains(.option) {
+                    modifierSymbol("⌥")
+                }
+                if shortcut.modifiers.contains(.shift) {
+                    modifierSymbol("⇧")
+                }
+                if shortcut.modifiers.contains(.command) {
+                    modifierSymbol("⌘")
+                }
+                
+                // Display the key
+                Text(keyDisplayName(for: shortcut.key))
+                    .font(.system(.body, design: .monospaced, weight: .medium))
+                    .foregroundColor(theme.keyText)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(theme.keyBackground.opacity(0.6))
+                    )
+            } else {
+                Text("⌘`")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(theme.keyText)
+            }
+        }
+    }
+    
+    private func modifierSymbol(_ symbol: String) -> some View {
+        Text(symbol)
+            .font(.system(.body, design: .monospaced, weight: .medium))
+            .foregroundColor(theme.keyText)
+            .frame(width: 20, height: 20)
+            .background(
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(theme.keyBackground.opacity(0.6))
+            )
+    }
+    
+    private func keyDisplayName(for key: KeyboardShortcuts.Key?) -> String {
+        guard let key = key else { return "?" }
+        
+        switch key {
+        case .a: return "A"
+        case .b: return "B"
+        case .c: return "C"
+        case .d: return "D"
+        case .e: return "E"
+        case .f: return "F"
+        case .g: return "G"
+        case .h: return "H"
+        case .i: return "I"
+        case .j: return "J"
+        case .k: return "K"
+        case .l: return "L"
+        case .m: return "M"
+        case .n: return "N"
+        case .o: return "O"
+        case .p: return "P"
+        case .q: return "Q"
+        case .r: return "R"
+        case .s: return "S"
+        case .t: return "T"
+        case .u: return "U"
+        case .v: return "V"
+        case .w: return "W"
+        case .x: return "X"
+        case .y: return "Y"
+        case .z: return "Z"
+        case .zero: return "0"
+        case .one: return "1"
+        case .two: return "2"
+        case .three: return "3"
+        case .four: return "4"
+        case .five: return "5"
+        case .six: return "6"
+        case .seven: return "7"
+        case .eight: return "8"
+        case .nine: return "9"
+        case .backtick: return "`"
+        case .minus: return "-"
+        case .equal: return "="
+        case .leftBracket: return "["
+        case .rightBracket: return "]"
+        case .backslash: return "\\"
+        case .semicolon: return ";"
+        case .quote: return "'"
+        case .comma: return ","
+        case .period: return "."
+        case .slash: return "/"
+        case .space: return "Space"
+        case .tab: return "Tab"
+        case .return: return "Return"
+        case .escape: return "Esc"
+        case .delete: return "Delete"
+        case .f1: return "F1"
+        case .f2: return "F2"
+        case .f3: return "F3"
+        case .f4: return "F4"
+        case .f5: return "F5"
+        case .f6: return "F6"
+        case .f7: return "F7"
+        case .f8: return "F8"
+        case .f9: return "F9"
+        case .f10: return "F10"
+        case .f11: return "F11"
+        case .f12: return "F12"
+        default: return "?"
+        }
+    }
+    
+    private func loadCurrentShortcut() {
+        currentShortcut = KeyboardShortcuts.getShortcut(for: .toggleKeyOgre)
+    }
+    
+    private func toggleRecording() {
+        if isRecording {
+            stopRecording()
+        } else {
+            startRecording()
+        }
+    }
+    
+    private func startRecording() {
+        isRecording = true
+        
+        // Create a local event monitor for recording the new shortcut
+        eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            let keyCode = KeyboardShortcuts.Key(rawValue: Int(UInt32(event.keyCode)))
+            let modifiers = event.modifierFlags.intersection([.command, .option, .control, .shift])
+            
+                let newShortcut = KeyboardShortcuts.Shortcut(keyCode, modifiers: modifiers)
+                
+                // Update the shortcut
+                KeyboardShortcuts.setShortcut(newShortcut, for: .toggleKeyOgre)
+                currentShortcut = newShortcut
+                
+                DispatchQueue.main.async {
+                    self.stopRecording()
+                }
+                
+                // Don't pass the event through
+                return nil
+        }
+        
+        // Auto-cancel recording after 10 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            if self.isRecording {
+                self.stopRecording()
+            }
+        }
+    }
+    
+    private func stopRecording() {
+        isRecording = false
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
+        }
+    }
+    
+    private func resetToDefault() {
+        KeyboardShortcuts.reset(.toggleKeyOgre)
+        loadCurrentShortcut()
+    }
+}
+
+struct HotkeyInputView_Previews: PreviewProvider {
+    static var previews: some View {
+        HotkeyInputView()
+            .frame(width: 400)
+            .padding()
+            .background(Color.black.opacity(0.1))
+    }
+}
