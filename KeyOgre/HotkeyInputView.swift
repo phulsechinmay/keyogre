@@ -7,8 +7,8 @@ import KeyboardShortcuts
 struct HotkeyInputView: View {
     @ObservedObject private var keyboardShortcutsManager = KeyboardShortcutsManager.shared
     @State private var isRecording = false
-    @State private var currentShortcut: KeyboardShortcuts.Shortcut?
     @State private var eventMonitor: Any?
+    @State private var refreshTrigger = false
     
     private let theme = ColorTheme.defaultTheme
     
@@ -20,7 +20,7 @@ struct HotkeyInputView: View {
                     .font(.headline)
                     .foregroundColor(theme.keyText)
                 
-                Text("Hotkey to show/hide the Keyogre window")
+                Text("Hotkey to show/hide the KeyOgre window")
                     .font(.caption)
                     .foregroundColor(theme.keyText.opacity(0.5))
             }
@@ -48,6 +48,8 @@ struct HotkeyInputView: View {
                     Spacer()
                     
                     // Clear button (x) inside the input box - only show when hotkey is set and not recording
+                    let currentShortcut = 
+        KeyboardShortcuts.getShortcut(for: .toggleKeyOgre)
                     if currentShortcut != nil && !isRecording {
                         Button(action: clearHotkey) {
                             Image(systemName: "xmark")
@@ -86,16 +88,16 @@ struct HotkeyInputView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .onAppear {
-            loadCurrentShortcut()
-        }
         .onDisappear {
             stopRecording()
         }
     }
     
     private var shortcutDisplay: some View {
-        HStack(spacing: 4) {
+        // Dependency on refresh trigger so we update view 
+        let _ = refreshTrigger;
+        let currentShortcut = KeyboardShortcuts.getShortcut(for: .toggleKeyOgre)
+        return HStack(spacing: 4) {
             if let shortcut = currentShortcut {
                 // Display modifier symbols
                 if shortcut.modifiers.contains(.control) {
@@ -122,9 +124,9 @@ struct HotkeyInputView: View {
                             .fill(theme.keyBackground.opacity(0.6))
                     )
             } else {
-                Text("⌘`")
+                Text("Record hotkey")
                     .font(.system(.body, design: .monospaced))
-                    .foregroundColor(theme.keyText)
+                    .foregroundColor(theme.keyText.opacity(0.7))
             }
         }
     }
@@ -161,10 +163,6 @@ struct HotkeyInputView: View {
         }
     }
     
-    private func loadCurrentShortcut() {
-        currentShortcut = KeyboardShortcuts.getShortcut(for: .toggleKeyOgre)
-    }
-    
     private func toggleRecording() {
         if isRecording {
             stopRecording()
@@ -185,7 +183,6 @@ struct HotkeyInputView: View {
                 
                 // Update the shortcut
                 KeyboardShortcuts.setShortcut(newShortcut, for: .toggleKeyOgre)
-                currentShortcut = newShortcut
                 
                 DispatchQueue.main.async {
                     self.stopRecording()
@@ -212,8 +209,9 @@ struct HotkeyInputView: View {
     }
     
     private func clearHotkey() {
-        KeyboardShortcuts.reset(.toggleKeyOgre)
-        currentShortcut = nil
+        KeyboardShortcuts.setShortcut(nil, for: .toggleKeyOgre)
+        // Update hotkey input view to show no hotkey
+        refreshTrigger.toggle()
     }
 }
 
