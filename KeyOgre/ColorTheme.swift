@@ -9,6 +9,7 @@ struct ColorTheme {
     let keyBorder: Color
     let keyText: Color
     let windowBackground: Color
+    let settingsInputBackgroundColor: Color
     let name: String
     
     // Pastel Light theme (matches reference video)
@@ -18,6 +19,7 @@ struct ColorTheme {
         keyBorder: Color(red: 0.85, green: 0.85, blue: 0.88),
         keyText: Color(red: 0.3, green: 0.3, blue: 0.4),
         windowBackground: Color(red: 0.98, green: 0.98, blue: 0.99),
+        settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
         name: "Pastel Light"
     )
     
@@ -28,6 +30,7 @@ struct ColorTheme {
         keyBorder: Color(red: 0.6, green: 0.6, blue: 0.7, opacity: 0.8),
         keyText: Color(red: 0.15, green: 0.15, blue: 0.25, opacity: 0.9),
         windowBackground: Color(red: 0.95, green: 0.95, blue: 0.98, opacity: 0.5),
+        settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
         name: "Translucent Light"
     )
     
@@ -38,6 +41,7 @@ struct ColorTheme {
         keyBorder: Color(red: 0.35, green: 0.35, blue: 0.38),
         keyText: Color(red: 0.85, green: 0.85, blue: 0.88),
         windowBackground: Color(red: 0.20, green: 0.20, blue: 0.22),
+        settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
         name: "Pastel Dark"
     )
     
@@ -48,6 +52,7 @@ struct ColorTheme {
         keyBorder: Color(red: 0.45, green: 0.45, blue: 0.5, opacity: 0.8),
         keyText: Color(red: 0.9, green: 0.9, blue: 0.95, opacity: 0.95),
         windowBackground: Color(red: 0.29, green: 0.33, blue: 0.41, opacity: 0.7),
+        settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
         name: "Translucent Dark"
     )
     
@@ -58,6 +63,7 @@ struct ColorTheme {
         keyBorder: Color.black,
         keyText: Color.black,
         windowBackground: Color.white,
+        settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
         name: "High Contrast"
     )
     

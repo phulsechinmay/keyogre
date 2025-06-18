@@ -13,84 +13,79 @@ struct HotkeyInputView: View {
     private let theme = ColorTheme.defaultTheme
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Section header
-            HStack {
+        HStack(alignment: .top, spacing: 20) {
+            // Left side: Title and instructions
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Toggle Hotkey")
                     .font(.headline)
                     .foregroundColor(theme.keyText)
                 
-                Spacer()
-                
-                Button(action: resetToDefault) {
-                    Text("Reset")
-                        .font(.caption)
-                        .foregroundColor(theme.keyText.opacity(0.7))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(theme.keyBackground.opacity(0.5))
-                        )
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-            
-            // Hotkey input area
-            HStack(spacing: 12) {
-                // Current hotkey display/input
-                Button(action: toggleRecording) {
-                    HStack(spacing: 8) {
-                        if isRecording {
-                            HStack(spacing: 6) {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 8, height: 8)
-                                
-                                Text("recording hotkey...")
-                                    .font(.system(.body, design: .monospaced))
-                                    .foregroundColor(theme.keyText.opacity(0.7))
-                                    .italic()
-                            }
-                        } else {
-                            shortcutDisplay
-                        }
-                        
-                        Spacer()
-                        
-                        Image(systemName: isRecording ? "stop.circle.fill" : "pencil")
-                            .font(.system(size: 14))
-                            .foregroundColor(theme.keyText.opacity(0.6))
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(isRecording ? theme.keyHighlight.opacity(0.3) : theme.keyBackground.opacity(0.8))
-                            .stroke(isRecording ? theme.keyHighlight : theme.keyBorder, lineWidth: 1)
-                    )
-                }
-                .buttonStyle(PlainButtonStyle())
-                .onHover { hovering in
-                    if hovering {
-                        NSCursor.pointingHand.push()
-                    } else {
-                        NSCursor.pop()
-                    }
-                }
-                
-                // Instructions
-                Text(isRecording ? "Press any key combination" : "Click to change")
+                Text("Hotkey to show/hide the Keyogre window")
                     .font(.caption)
                     .foregroundColor(theme.keyText.opacity(0.5))
+            }
+            
+            Spacer()
+            
+            // Right side: Hotkey input with embedded clear button
+            Button(action: toggleRecording) {
+                HStack(spacing: 8) {
+                    if isRecording {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                            
+                            Text("recording...")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(theme.keyText.opacity(0.7))
+                                .italic()
+                        }
+                    } else {
+                        shortcutDisplay
+                    }
+                    
+                    Spacer()
+                    
+                    // Clear button (x) inside the input box - only show when hotkey is set and not recording
+                    if currentShortcut != nil && !isRecording {
+                        Button(action: clearHotkey) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundColor(.black)
+                                .frame(width: 16, height: 16)
+                                .background(Circle().fill(Color.white))
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .onHover { hovering in
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .frame(width: 180, height: 40) // Fixed width for consistent size
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isRecording ? theme.settingsInputBackgroundColor.opacity(0.3) : theme.settingsInputBackgroundColor)
+                        .stroke(theme.keyBorder, lineWidth: 1)
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(theme.windowBackground.opacity(0.3))
-        )
         .onAppear {
             loadCurrentShortcut()
         }
@@ -216,9 +211,9 @@ struct HotkeyInputView: View {
         }
     }
     
-    private func resetToDefault() {
+    private func clearHotkey() {
         KeyboardShortcuts.reset(.toggleKeyOgre)
-        loadCurrentShortcut()
+        currentShortcut = nil
     }
 }
 
