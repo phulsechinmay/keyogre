@@ -168,6 +168,7 @@ struct GeneralSettingsContent: View {
 struct KeyboardsSettingsContent: View {
     @StateObject private var layoutManager = KeyboardLayoutManager.shared
     @StateObject private var previewManager = KeyboardPreviewWindowManager()
+    @State private var showingAddKeyboard = false
     
     var body: some View {
         InnerSettingsView {
@@ -197,59 +198,53 @@ struct KeyboardsSettingsContent: View {
                         .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 )
                 
-                // Layout Selection
+                // Layout Selection with Add Button
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Available Keyboards")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    ForEach(layoutManager.availableLayouts, id: \.self) { layoutName in
-                        HStack {
-                            Button(action: {
-                                layoutManager.switchToLayout(named: layoutName)
-                            }) {
-                                HStack {
-                                    Image(systemName: layoutManager.selectedLayoutName == layoutName ? "checkmark.circle.fill" : "circle")
-                                        .foregroundColor(layoutManager.selectedLayoutName == layoutName ? .green : .white.opacity(0.6))
-                                    
-                                    Text(layoutName)
-                                        .foregroundColor(.white)
-                                    
-                                    Spacer()
-                                }
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 12)
+                    HStack {
+                        Text("Available Keyboards")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Spacer()
+                        
+                        // Add Keyboard Button
+                        Button(action: {
+                            showingAddKeyboard = true
+                        }) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.blue.opacity(0.8))
+                                .frame(width: 28, height: 28)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.1) : Color.white.opacity(0.05))
-                                        .stroke(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.3) : Color.white.opacity(0.1), lineWidth: 1)
+                                    Circle()
+                                        .fill(Color.blue.opacity(0.1))
+                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
                                 )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            
-                            // Eye icon for preview
-                            Button(action: {
-                                previewManager.showPreview(for: layoutName)
-                            }) {
-                                Image(systemName: "eye")
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.blue.opacity(0.8))
-                                    .frame(width: 32, height: 32)
-                                    .background(
-                                        Circle()
-                                            .fill(Color.blue.opacity(0.1))
-                                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                                    )
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .onHover { hovering in
-                                if hovering {
-                                    NSCursor.pointingHand.push()
-                                } else {
-                                    NSCursor.pop()
-                                }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .onHover { hovering in
+                            if hovering {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
                             }
                         }
+                    }
+                    
+                    ForEach(layoutManager.availableConfigurations) { config in
+                        KeyboardConfigurationRow(
+                            config: config,
+                            isSelected: layoutManager.selectedConfiguration?.id == config.id,
+                            onSelect: {
+                                layoutManager.switchToConfiguration(config)
+                            },
+                            onPreview: {
+                                previewManager.showPreview(for: config.name)
+                            },
+                            onDelete: config.isDeletable ? {
+                                layoutManager.removeConfiguration(config)
+                            } : nil
+                        )
                     }
                 }
                 .padding(16)
@@ -258,6 +253,92 @@ struct KeyboardsSettingsContent: View {
                         .fill(Color.white.opacity(0.05))
                         .stroke(Color.white.opacity(0.1), lineWidth: 1)
                 )
+            }
+        }
+        .sheet(isPresented: $showingAddKeyboard) {
+            AddKeyboardView(isPresented: $showingAddKeyboard)
+        }
+    }
+}
+
+struct KeyboardConfigurationRow: View {
+    let config: KeyboardConfiguration
+    let isSelected: Bool
+    let onSelect: () -> Void
+    let onPreview: () -> Void
+    let onDelete: (() -> Void)?
+    
+    var body: some View {
+        HStack {
+            Button(action: onSelect) {
+                HStack {
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isSelected ? .green : .white.opacity(0.6))
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(config.name)
+                            .foregroundColor(.white)
+                            .font(.body)
+                        
+                        Text(config.type.displayName)
+                            .foregroundColor(.white.opacity(0.6))
+                            .font(.caption)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isSelected ? Color.green.opacity(0.1) : Color.white.opacity(0.05))
+                        .stroke(isSelected ? Color.green.opacity(0.3) : Color.white.opacity(0.1), lineWidth: 1)
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // Eye icon for preview
+            Button(action: onPreview) {
+                Image(systemName: "eye")
+                    .font(.system(size: 16))
+                    .foregroundColor(.blue.opacity(0.8))
+                    .frame(width: 32, height: 32)
+                    .background(
+                        Circle()
+                            .fill(Color.blue.opacity(0.1))
+                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                    )
+            }
+            .buttonStyle(PlainButtonStyle())
+            .onHover { hovering in
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+            
+            // Delete button (only for deletable keyboards)
+            if let onDelete = onDelete {
+                Button(action: onDelete) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 14))
+                        .foregroundColor(.red.opacity(0.8))
+                        .frame(width: 28, height: 28)
+                        .background(
+                            Circle()
+                                .fill(Color.red.opacity(0.1))
+                                .stroke(Color.red.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(PlainButtonStyle())
+                .onHover { hovering in
+                    if hovering {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
             }
         }
     }

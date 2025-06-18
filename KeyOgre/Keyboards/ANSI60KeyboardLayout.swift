@@ -8,6 +8,7 @@ import SwiftUI
 class ANSI60KeyboardLayout: ObservableObject {
     let keys: [Key]
     let totalSize: CGSize
+    let name: String = "ANSI 60%"
     
     init(withColors: Bool = true) {
         // ANSI 60% layout dimensions and positioning
