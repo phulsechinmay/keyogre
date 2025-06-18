@@ -53,8 +53,8 @@ class ZMKKeyboardLayout: ObservableObject {
         var keys: [Key] = []
         
         for zmkKey in zmkKeys {
-            // Create a dummy keyCode for now (we'll use the key index)
-            let keyCode = CGKeyCode(zmkKey.keyIndex)
+            // Get the proper macOS keycode from the ZMK binding
+            let keyCode = KeyCodeMapper.getMacOSKeyCode(for: zmkKey.binding) ?? CGKeyCode(zmkKey.keyIndex + 1000)
             
             // Use the display name from the key binding
             let legend = zmkKey.displayName.isEmpty ? "?" : zmkKey.displayName

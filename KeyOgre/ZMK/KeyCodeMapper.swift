@@ -2,8 +2,42 @@
 // ABOUTME: Handles &kp codes, modifiers, special behaviors, and Bluetooth functions
 
 import Foundation
+import CoreGraphics
 
 class KeyCodeMapper {
+    
+    // Map ZMK key codes to macOS hardware keycodes
+    // Reference: https://developer.apple.com/library/archive/technotes/tn2450/_index.html
+    private static let zmkToMacOSKeyCode: [String: CGKeyCode] = [
+        // Numbers
+        "N1": 18, "N2": 19, "N3": 20, "N4": 21, "N5": 23,
+        "N6": 22, "N7": 26, "N8": 28, "N9": 25, "N0": 29,
+        
+        // Letters
+        "A": 0, "B": 11, "C": 8, "D": 2, "E": 14, "F": 3, "G": 5, "H": 4, "I": 34, "J": 38,
+        "K": 40, "L": 37, "M": 46, "N": 45, "O": 31, "P": 35, "Q": 12, "R": 15, "S": 1, "T": 17,
+        "U": 32, "V": 9, "W": 13, "X": 7, "Y": 16, "Z": 6,
+        
+        // Symbols and punctuation
+        "GRAVE": 50, "MINUS": 27, "EQUAL": 24, "LBKT": 33, "RBKT": 30,
+        "BSLH": 42, "SEMI": 41, "APOS": 39, "COMMA": 43, "DOT": 47, "FSLH": 44,
+        
+        // Special keys
+        "SPACE": 49, "BSPC": 51, "TAB": 48, "RET": 36, "ESC": 53,
+        "DEL": 117, "HOME": 115, "END": 119, "PGUP": 116, "PGDN": 121,
+        
+        // Modifiers
+        "LSHFT": 56, "RSHFT": 60, "LCTRL": 59, "RCTRL": 62,
+        "LALT": 58, "RALT": 61, "LGUI": 55, "RGUI": 54,
+        "CAPS": 57,
+        
+        // Arrow keys
+        "LARW": 123, "DARW": 125, "UARW": 126, "RARW": 124,
+        
+        // Function keys
+        "F1": 122, "F2": 120, "F3": 99, "F4": 118, "F5": 96, "F6": 97,
+        "F7": 98, "F8": 100, "F9": 101, "F10": 109, "F11": 103, "F12": 111
+    ]
     
     // Map ZMK key codes to display names
     // Reference: https://zmk.dev/docs/codes/keyboard-keypad
@@ -58,6 +92,19 @@ class KeyCodeMapper {
         "BT_NXT": "BT →",
         "BT_PRV": "BT ←"
     ]
+    
+    static func getMacOSKeyCode(for binding: String) -> CGKeyCode? {
+        let trimmed = binding.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Handle basic key press: &kp KEY_CODE
+        if trimmed.hasPrefix("&kp ") {
+            let keyCode = String(trimmed.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+            return zmkToMacOSKeyCode[keyCode]
+        }
+        
+        // For other behaviors (layers, BT, etc.), return nil as these don't have direct macOS mappings
+        return nil
+    }
     
     static func mapKeyBinding(_ binding: String) -> String {
         let trimmed = binding.trimmingCharacters(in: .whitespacesAndNewlines)
