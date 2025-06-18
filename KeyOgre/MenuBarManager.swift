@@ -92,8 +92,7 @@ class MenuBarManager: ObservableObject {
     
     @objc private func openSettings() {
         print("KeyOgre: Menu bar - Settings selected")
-        // TODO: Implement settings window
-        showSettingsAlert()
+        appDelegate?.showSettings()
     }
     
     @objc private func quitApp() {
@@ -101,14 +100,6 @@ class MenuBarManager: ObservableObject {
         NSApplication.shared.terminate(nil)
     }
     
-    private func showSettingsAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Settings"
-        alert.informativeText = "Settings window will be implemented in a future update."
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
-    }
     
     func updateMenuText(isVisible: Bool) {
         // Update the menu item text based on window visibility

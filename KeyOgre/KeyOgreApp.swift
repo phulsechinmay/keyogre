@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let keyEventTap = KeyEventTap()
     private let dropdownManager = DropdownWindowManager()
     private let keyboardShortcutsManager = KeyboardShortcutsManager.shared
+    private let settingsWindowManager = SettingsWindowManager()
     private var menuBarManager: MenuBarManager?
     private var isWindowVisible = false
     
@@ -107,6 +108,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuBarManager?.updateMenuText(isVisible: false)
         
         print("KeyOgre: Window hidden")
+    }
+    
+    func showSettings() {
+        settingsWindowManager.showSettings()
     }
 }
 

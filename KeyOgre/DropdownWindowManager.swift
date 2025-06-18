@@ -201,8 +201,6 @@ struct DropdownContentView: View {
                 
                 KeyboardView()
                     .environmentObject(keyEventTap)
-                
-                HotkeyInputView()
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
