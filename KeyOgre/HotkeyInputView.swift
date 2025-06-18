@@ -148,72 +148,21 @@ struct HotkeyInputView: View {
     private func keyDisplayName(for key: KeyboardShortcuts.Key?) -> String {
         guard let key = key else { return "?" }
         
+        // Create a temporary shortcut with no modifiers to get the key character
+        let shortcut = KeyboardShortcuts.Shortcut(key)
+        
+        // The shortcut description includes modifier symbols + key character
+        // Since we have no modifiers, this will just be the key character
+        let keyCharacter = shortcut.description
+        
+        // For certain special keys, provide more user-friendly names than symbols
         switch key {
-        case .a: return "A"
-        case .b: return "B"
-        case .c: return "C"
-        case .d: return "D"
-        case .e: return "E"
-        case .f: return "F"
-        case .g: return "G"
-        case .h: return "H"
-        case .i: return "I"
-        case .j: return "J"
-        case .k: return "K"
-        case .l: return "L"
-        case .m: return "M"
-        case .n: return "N"
-        case .o: return "O"
-        case .p: return "P"
-        case .q: return "Q"
-        case .r: return "R"
-        case .s: return "S"
-        case .t: return "T"
-        case .u: return "U"
-        case .v: return "V"
-        case .w: return "W"
-        case .x: return "X"
-        case .y: return "Y"
-        case .z: return "Z"
-        case .zero: return "0"
-        case .one: return "1"
-        case .two: return "2"
-        case .three: return "3"
-        case .four: return "4"
-        case .five: return "5"
-        case .six: return "6"
-        case .seven: return "7"
-        case .eight: return "8"
-        case .nine: return "9"
-        case .backtick: return "`"
-        case .minus: return "-"
-        case .equal: return "="
-        case .leftBracket: return "["
-        case .rightBracket: return "]"
-        case .backslash: return "\\"
-        case .semicolon: return ";"
-        case .quote: return "'"
-        case .comma: return ","
-        case .period: return "."
-        case .slash: return "/"
         case .space: return "Space"
-        case .tab: return "Tab"
+        case .tab: return "Tab" 
         case .return: return "Return"
         case .escape: return "Esc"
         case .delete: return "Delete"
-        case .f1: return "F1"
-        case .f2: return "F2"
-        case .f3: return "F3"
-        case .f4: return "F4"
-        case .f5: return "F5"
-        case .f6: return "F6"
-        case .f7: return "F7"
-        case .f8: return "F8"
-        case .f9: return "F9"
-        case .f10: return "F10"
-        case .f11: return "F11"
-        case .f12: return "F12"
-        default: return "?"
+        default: return keyCharacter
         }
     }
     
@@ -281,3 +230,4 @@ struct HotkeyInputView_Previews: PreviewProvider {
             .background(Color.black.opacity(0.1))
     }
 }
+
