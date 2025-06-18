@@ -6,7 +6,7 @@ import Combine
 
 struct KeyboardView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
-    @StateObject private var keyboardLayout = ANSI60KeyboardLayout(withColors: true)
+    @StateObject private var keyboardLayout = KeyboardLayoutManager.shared
     @State private var cancellables = Set<AnyCancellable>()
     @State private var refreshTrigger = false
     
@@ -16,13 +16,13 @@ struct KeyboardView: View {
         Canvas { context, size in
                 let _ = refreshTrigger // Force dependency on refresh trigger
                 // Scale the layout to fit the available space
-                let scale = min(size.width / keyboardLayout.totalSize.width, 
-                               size.height / keyboardLayout.totalSize.height) * 0.9
+                let scale = min(size.width / keyboardLayout.currentLayout.totalSize.width, 
+                               size.height / keyboardLayout.currentLayout.totalSize.height) * 0.9
                 
-                let offsetX = (size.width - keyboardLayout.totalSize.width * scale) / 2
-                let offsetY = (size.height - keyboardLayout.totalSize.height * scale) / 2
+                let offsetX = (size.width - keyboardLayout.currentLayout.totalSize.width * scale) / 2
+                let offsetY = (size.height - keyboardLayout.currentLayout.totalSize.height * scale) / 2
                 
-                for key in keyboardLayout.keys {
+                for key in keyboardLayout.currentLayout.keys {
                     let scaledFrame = CGRect(
                         x: key.frame.origin.x * scale + offsetX,
                         y: key.frame.origin.y * scale + offsetY,

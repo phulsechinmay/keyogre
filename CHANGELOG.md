@@ -45,8 +45,69 @@
 - **Visual Polish**: Updated keyboard rendering to match screenshot with smaller corner radius and tighter key grouping
 - **Swift 6 Compatibility**: Fixed protocol references and type checking for modern Swift
 
+### 2025-06-18 - ZMK Keyboard Layout Loading Implementation
+- **ZMK Firmware Support**: Implemented comprehensive ZMK keyboard layout loading system
+  - Created complete ZMK parsing infrastructure in `KeyOgre/ZMK/` directory
+  - `ZMKDtsiParser.swift` - Parses `.dtsi` files for physical keyboard layouts with `key_physical_attrs`
+  - `ZMKKeymapParser.swift` - Parses `.keymap` files for key bindings and layer definitions
+  - `KeyCodeMapper.swift` - Maps ZMK key codes (`&kp GRAVE`, `&mo 1`, etc.) to display names
+  - `ZMKCommentRemover.swift` - Strips `//` line comments and `/* */` block comments from files
+
+- **Data Models**: Created comprehensive ZMK data structures
+  - `ZMKPhysicalLayout.swift` - Keyboard geometry with centi-keyunit positioning
+  - `ZMKKeymap.swift` - Multiple layer support with default layer detection
+  - `ZMKKey.swift` - Individual key with physical attributes and key bindings
+  - `ZMKKeyboardLayout.swift` - Integration adapter conforming to existing KeyOgre protocols
+
+- **Layout Management**: Enhanced keyboard system with multiple layout support
+  - `KeyboardLayoutManager.swift` - Centralized singleton managing ANSI 60% and ZMK layouts
+  - Smart file path resolution: bundle resources → development paths → fallback
+  - Real-time layout switching in Settings > Keyboards tab
+  - Typhon ZMK keyboard (60-key split layout) loads as default on startup
+
+- **Sandboxing & Permissions**: Fixed macOS app sandbox file access issues
+  - Added file access entitlements: `com.apple.security.files.user-selected.read-only`
+  - Added temporary exception: `com.apple.security.temporary-exception.files.absolute-path.read-only`
+  - Resolved "Operation not permitted" errors for ZMK file reading
+
+- **Testing Infrastructure**: Created comprehensive test suite
+  - `ZMKParserTests.swift` - Unit tests for file parsing and key code mapping
+  - `ZMKIntegrationTests.swift` - End-to-end tests covering startup, layout creation, and performance
+  - Comment removal validation and ZMK file format compliance testing
+
+- **Settings Integration**: Enhanced Settings > Keyboards tab
+  - Live keyboard preview with first 12 keys displayed
+  - Current keyboard status with key count and layout type
+  - Layout switching between "ANSI 60%" and "Typhon (ZMK)"
+  - ZMK debug information display for technical validation
+
+### Technical Implementation Details
+- **ZMK Documentation Integration**: Built parser based on official ZMK specs
+  - Physical layouts: https://zmk.dev/docs/development/hardware-integration/physical-layouts
+  - Keymaps: https://zmk.dev/docs/keymaps
+  - Key codes: https://zmk.dev/docs/codes
+  - Behaviors: https://zmk.dev/docs/behaviors
+
+- **Comment Handling**: Robust preprocessing system handles devicetree comment syntax
+  - Line comments: `// comment` (everything after // to end of line)
+  - Block comments: `/* comment */` (including multi-line blocks)
+  - Preserves file structure while enabling accurate regex parsing
+
+- **Coordinate System**: Converts ZMK centi-keyunits to KeyOgre display coordinates
+  - Scale factor 0.4 converts 100 centi-keyunits → 40 points
+  - Handles split keyboard layouts with proper left/right positioning
+  - Maintains aspect ratios and key spacing from original ZMK definitions
+
+### Current Status
+- ✅ Typhon ZMK keyboard loads successfully as default layout
+- ✅ 60 keys display with proper split keyboard positioning  
+- ✅ Comment removal and file parsing working correctly
+- ⚠️ Key character mapping needs refinement (some labels incorrect)
+- ✅ Settings integration and layout switching functional
+- ✅ Comprehensive test coverage for all ZMK components
+
 ### Future Milestones Planning
 - M2: Typing practice with accuracy tracking and WPM calculation
 - M3: UX polish with slide animations and theme selection
-- M4: Custom ZMK layout parsing and storage
+- M4: ~~Custom ZMK layout parsing and storage~~ **COMPLETED**
 - M5: Distribution with hardened runtime and notarization
