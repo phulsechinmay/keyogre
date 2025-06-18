@@ -134,7 +134,9 @@ struct InnerSettingsView<Content: View>: View {
         VStack(alignment: .leading, spacing: 16) {
             content
         }
-        .padding(20)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
+        .padding(.top, 60) // Extra top padding for tabbar overlay spacing
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(red: 0.19, green: 0.19, blue: 0.18))
