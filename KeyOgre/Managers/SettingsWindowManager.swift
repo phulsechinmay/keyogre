@@ -46,10 +46,10 @@ class SettingsWindowManager: ObservableObject {
             height: windowHeight
         )
         
-        // Create window with standard settings window style
+        // Create window with resizable settings window style
         let window = NSWindow(
             contentRect: windowFrame,
-            styleMask: [.titled, .closable, .miniaturizable],
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
@@ -57,6 +57,7 @@ class SettingsWindowManager: ObservableObject {
         window.contentViewController = hostingController
         window.title = "KeyOgre Settings"
         window.isReleasedWhenClosed = false
+        window.minSize = NSSize(width: 500, height: 350)
         window.center()
         
         // Store reference and show

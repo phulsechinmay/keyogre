@@ -76,7 +76,7 @@ struct SettingsView: View {
             }
             .padding(.top, 20)
         }
-        .frame(width: 600, height: 400)
+        .frame(minWidth: 500, minHeight: 350)
     }
 }
 
@@ -167,6 +167,7 @@ struct GeneralSettingsContent: View {
 
 struct KeyboardsSettingsContent: View {
     @StateObject private var layoutManager = KeyboardLayoutManager.shared
+    @StateObject private var previewManager = KeyboardPreviewWindowManager()
     
     var body: some View {
         InnerSettingsView {
@@ -203,74 +204,52 @@ struct KeyboardsSettingsContent: View {
                         .foregroundColor(.white)
                     
                     ForEach(layoutManager.availableLayouts, id: \.self) { layoutName in
-                        Button(action: {
-                            layoutManager.switchToLayout(named: layoutName)
-                        }) {
-                            HStack {
-                                Image(systemName: layoutManager.selectedLayoutName == layoutName ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(layoutManager.selectedLayoutName == layoutName ? .green : .white.opacity(0.6))
-                                
-                                Text(layoutName)
-                                    .foregroundColor(.white)
-                                
-                                Spacer()
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.1) : Color.white.opacity(0.05))
-                                    .stroke(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.3) : Color.white.opacity(0.1), lineWidth: 1)
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                }
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.white.opacity(0.05))
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-                
-                // Keyboard Preview
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Keyboard Preview")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
-                    // Show first few keys as a test
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 4) {
-                            ForEach(layoutManager.currentLayout.keys.prefix(12), id: \.id) { key in
-                                VStack(spacing: 2) {
-                                    Text(key.baseLegend)
-                                        .font(.system(size: 10, weight: .medium))
+                        HStack {
+                            Button(action: {
+                                layoutManager.switchToLayout(named: layoutName)
+                            }) {
+                                HStack {
+                                    Image(systemName: layoutManager.selectedLayoutName == layoutName ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(layoutManager.selectedLayoutName == layoutName ? .green : .white.opacity(0.6))
+                                    
+                                    Text(layoutName)
                                         .foregroundColor(.white)
-                                    Text("\(Int(key.keyCode))")
-                                        .font(.system(size: 8))
-                                        .foregroundColor(.white.opacity(0.6))
+                                    
+                                    Spacer()
                                 }
-                                .frame(width: 32, height: 32)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, 12)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .fill(Color.white.opacity(0.1))
-                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.1) : Color.white.opacity(0.05))
+                                        .stroke(layoutManager.selectedLayoutName == layoutName ? Color.green.opacity(0.3) : Color.white.opacity(0.1), lineWidth: 1)
                                 )
                             }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            // Eye icon for preview
+                            Button(action: {
+                                previewManager.showPreview(for: layoutName)
+                            }) {
+                                Image(systemName: "eye")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.blue.opacity(0.8))
+                                    .frame(width: 32, height: 32)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.blue.opacity(0.1))
+                                            .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .onHover { hovering in
+                                if hovering {
+                                    NSCursor.pointingHand.push()
+                                } else {
+                                    NSCursor.pop()
+                                }
+                            }
                         }
-                        .padding(.horizontal, 8)
-                    }
-                    
-                    if let zmkLayout = layoutManager.currentLayout as? ZMKKeyboardLayout {
-                        Text(zmkLayout.debugInfo())
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(Color.white.opacity(0.8))
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.black.opacity(0.3))
-                            )
                     }
                 }
                 .padding(16)
