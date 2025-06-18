@@ -23,8 +23,35 @@ struct SettingsView: View {
     private let theme = ColorTheme.defaultTheme
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Tab Bar (centered, no full width background)
+        ZStack(alignment: .top) {
+            // Background
+            Color(red: 0.165, green: 0.165, blue: 0.157)
+                .ignoresSafeArea()
+            
+            // Content Area with top padding for tabbar overlay
+            VStack(spacing: 0) {
+                // Spacer to push content down where tabbar will overlay
+                Spacer()
+                    .frame(height: 30) // Half the tabbar height (60/2 = 30)
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        switch selectedTab {
+                        case .general:
+                            GeneralSettingsContent()
+                        case .keyboards:
+                            KeyboardsSettingsContent()
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 30) // Additional padding for the bottom half of tabbar
+                    .padding(.bottom, 24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            
+            // Tab Bar (overlayed on top)
             HStack {
                 Spacer()
 
@@ -48,27 +75,7 @@ struct SettingsView: View {
                 Spacer()
             }
             .padding(.top, 20)
-            .padding(.bottom, 20)
-
-            // Content Area
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    switch selectedTab {
-                    case .general:
-                        GeneralSettingsContent()
-                    case .keyboards:
-                        KeyboardsSettingsContent()
-                    }
-                }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 24)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .background(Color(red: 0.165, green: 0.165, blue: 0.157))  // iOS dark settings background
-        // Color for settings pane inner view
-        // Color(red: 0.19, green: 0.19, blue: 0.18)
         .frame(width: 600, height: 400)
     }
 }
