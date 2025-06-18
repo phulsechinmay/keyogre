@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let keyEventTap = KeyEventTap()
     private let dropdownManager = DropdownWindowManager()
     private let keyboardShortcutsManager = KeyboardShortcutsManager.shared
+    private var menuBarManager: MenuBarManager?
     private var isWindowVisible = false
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -31,6 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupMenuBarApp() {
         // Hide dock icon and make this a menu bar app
         NSApp.setActivationPolicy(.accessory)
+        
+        // Initialize menu bar icon and menu
+        menuBarManager = MenuBarManager(appDelegate: self)
+        print("KeyOgre: Menu bar app setup completed")
     }
     
     private func setupGlobalHotkey() {
@@ -68,7 +73,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     // MARK: - Window Management
-    private func toggleWindow() {
+    func toggleWindow() {
         if isWindowVisible {
             hideWindow()
         } else {
@@ -76,12 +81,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    private func showWindow() {
+    func showWindow() {
         // Start key monitoring when showing window
         keyEventTap.startMonitoring()
         
         dropdownManager.showDropdown(keyEventTap: keyEventTap)
         isWindowVisible = true
+        
+        // Update menu bar menu text
+        menuBarManager?.updateMenuText(isVisible: true)
         
         // Activate app to bring it to front
         NSApp.activate(ignoringOtherApps: true)
@@ -94,6 +102,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         dropdownManager.hideDropdown()
         isWindowVisible = false
+        
+        // Update menu bar menu text
+        menuBarManager?.updateMenuText(isVisible: false)
+        
         print("KeyOgre: Window hidden")
     }
 }
