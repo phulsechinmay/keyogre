@@ -7,6 +7,9 @@ import SwiftUI
 enum ProgrammingLanguage: String, CaseIterable, Identifiable {
     case python = "Python"
     case javascript = "JavaScript"
+    case typescript = "TypeScript"
+    case go = "Go"
+    case rust = "Rust"
     
     var id: String { rawValue }
     
@@ -14,6 +17,9 @@ enum ProgrammingLanguage: String, CaseIterable, Identifiable {
         switch self {
         case .python: return "py"
         case .javascript: return "js"
+        case .typescript: return "ts"
+        case .go: return "go"
+        case .rust: return "rs"
         }
     }
     
@@ -21,6 +27,9 @@ enum ProgrammingLanguage: String, CaseIterable, Identifiable {
         switch self {
         case .python: return "number"
         case .javascript: return "j.square"
+        case .typescript: return "t.square"
+        case .go: return "g.square"
+        case .rust: return "r.square"
         }
     }
 }

@@ -74,12 +74,124 @@ struct CodingPracticeContent {
         "console.log(timer.getTime());"
     ]
     
+    static let typescriptCode = [
+        "interface User {",
+        "    id: number;",
+        "    name: string;",
+        "    email?: string;",
+        "}",
+        "",
+        "function createUser(name: string): User {",
+        "    return {",
+        "        id: Math.random(),",
+        "        name,",
+        "    };",
+        "}",
+        "",
+        "const users: User[] = [",
+        "    createUser(\"Alice\"),",
+        "    createUser(\"Bob\"),",
+        "];",
+        "",
+        "class UserService {",
+        "    private users: User[] = [];",
+        "",
+        "    addUser(user: User): void {",
+        "        this.users.push(user);",
+        "    }",
+        "",
+        "    findById(id: number): User | null {",
+        "        return this.users.find(u => ",
+        "            u.id === id",
+        "        ) || null;",
+        "    }",
+        "}",
+        "",
+        "const service = new UserService();",
+        "users.forEach(u => service.addUser(u));"
+    ]
+    
+    static let goCode = [
+        "package main",
+        "",
+        "import (",
+        "    \"fmt\"",
+        "    \"strconv\"",
+        ")",
+        "",
+        "type Person struct {",
+        "    Name string",
+        "    Age  int",
+        "}",
+        "",
+        "func (p Person) String() string {",
+        "    return fmt.Sprintf(\"%s (%d)\", ",
+        "        p.Name, p.Age)",
+        "}",
+        "",
+        "func main() {",
+        "    people := []Person{",
+        "        {\"Alice\", 30},",
+        "        {\"Bob\", 25},",
+        "    }",
+        "",
+        "    for i, person := range people {",
+        "        fmt.Printf(\"%d: %s\\n\", ",
+        "            i, person)",
+        "    }",
+        "",
+        "    if len(people) > 0 {",
+        "        fmt.Println(\"Found people!\")",
+        "    }",
+        "}"
+    ]
+    
+    static let rustCode = [
+        "use std::collections::HashMap;",
+        "",
+        "#[derive(Debug, Clone)]",
+        "struct Book {",
+        "    title: String,",
+        "    pages: u32,",
+        "}",
+        "",
+        "impl Book {",
+        "    fn new(title: &str, pages: u32) -> Self {",
+        "        Self {",
+        "            title: title.to_string(),",
+        "            pages,",
+        "        }",
+        "    }",
+        "",
+        "    fn is_long(&self) -> bool {",
+        "        self.pages > 300",
+        "    }",
+        "}",
+        "",
+        "fn main() {",
+        "    let mut library = HashMap::new();",
+        "    ",
+        "    library.insert(1, Book::new(",
+        "        \"Rust Book\", 500));",
+        "    ",
+        "    if let Some(book) = library.get(&1) {",
+        "        println!(\"{:?}\", book);",
+        "    }",
+        "}"
+    ]
+    
     func getCodeLines(for language: ProgrammingLanguage) -> [String] {
         switch language {
         case .python:
             return Self.pythonCode
         case .javascript:
             return Self.javascriptCode
+        case .typescript:
+            return Self.typescriptCode
+        case .go:
+            return Self.goCode
+        case .rust:
+            return Self.rustCode
         }
     }
 }
