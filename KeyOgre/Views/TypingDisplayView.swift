@@ -1,81 +1,74 @@
 // ABOUTME: iOS calendar picker-style UI displaying typing history with true 3D cylinder effect
-// ABOUTME: Shows 4 lines total - current line prominent, 3 previous lines with progressive rotation
+// ABOUTME: Shows 3 lines total - current line prominent, 2 previous lines with progressive rotation
 
 import SwiftUI
 import Combine
 
+
 struct TypingDisplayView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
-    @State private var typingLines = TypingLines(currentLine: "", previousLine1: "", previousLine2: "", previousLine3: "", allText: "")
+    @State private var typingLines = TypingLines(currentLine: "", previousLine1: "", previousLine2: "", allText: "")
     @State private var cancellables = Set<AnyCancellable>()
     
     private let theme = ColorTheme.defaultTheme
     private let maxLineWidth: CGFloat = 350
     private let lineHeight: CGFloat = 24
-    private let cylinderHeight: CGFloat = 150
+    private let cylinderHeight: CGFloat = 60
     private let lineSpacing: CGFloat = 20  // Equal spacing between all lines
     private let fontSize: CGFloat = 18     // Same font size for all lines
     
     
-    // ──────────────── hard-coded styling constants ────────────────
-    private let kYOffsetP3:  CGFloat =  -60      // 3 rows above centre
-    private let kYOffsetP2:  CGFloat =  -47      // 2 rows above centre
-    private let kYOffsetP1:  CGFloat =  -25      // 1 row  above centre
-    private let kYOffsetCur: CGFloat =    0      // centre row
-
-    private let kOpacityP3:  Double  = 0.40
-    private let kOpacityP2:  Double  = 0.55
-    private let kOpacityP1:  Double  = 0.75
-    private let kOpacityCur: Double  = 1.00
-
-    private let kPerspective          = 0.7      // shared for all rows
+    // ──────────────── generalized styling constants ────────────────
+    private let baseYOffset: CGFloat = -25       // Base offset per line from center
+    private let baseOpacity: Double = 0.25       // Base opacity reduction per line from center
+    private let baseXRotation: CGFloat = -22     // Base X-axis rotation per line
+    private let baseYRotation: CGFloat = 1       // Base Y-axis rotation per line
+    private let perspective: CGFloat = 0.7       // Shared perspective for all rows
     // ───────────────────────────────────────────────────────────────
     
     var body: some View {
         VStack(spacing: 0) {
             // 3D Cylinder container matching iOS calendar picker
             ZStack {
-                // 2-nd previous line
+                // 2nd previous line (index 2)
                 lineView(text: typingLines.previousLine2.isEmpty ? " " : typingLines.previousLine2,
                          fontSize: fontSize)
-                    .rotation3DEffect(.degrees(-44),
+                    .rotation3DEffect(.degrees(baseXRotation * 2),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .center,
-                                      perspective: kPerspective)
-                    .rotation3DEffect(.degrees(2),               // try 2-3°
+                                      perspective: perspective)
+                    .rotation3DEffect(.degrees(baseYRotation * 2),
                                       axis: (x: 0, y: 1, z: 0),
-                                      perspective: 0.7)
-                    .opacity(kOpacityP2)
-                    .offset(y: kYOffsetP2)
+                                      perspective: perspective)
+                    .opacity(1.0 - (baseOpacity * 2))
+                    .offset(y: baseYOffset * 1.85)
 
-
-                // 1-st previous line (nearest above centre)
+                // 1st previous line (index 1)
                 lineView(text: typingLines.previousLine1.isEmpty ? " " : typingLines.previousLine1,
                          fontSize: fontSize)
-                    .rotation3DEffect(.degrees(-22),
+                    .rotation3DEffect(.degrees(baseXRotation),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .center,
-                                      perspective: kPerspective)
-                    .rotation3DEffect(.degrees(1),               // try 2-3°
+                                      perspective: perspective)
+                    .rotation3DEffect(.degrees(baseYRotation),
                                       axis: (x: 0, y: 1, z: 0),
-                                      perspective: 0.7)
-                    .opacity(kOpacityP1)
-                    .offset(y: kYOffsetP1)
+                                      perspective: perspective)
+                    .opacity(1.0 - baseOpacity)
+                    .offset(y: baseYOffset)
 
-
-                // Current line (centre row)
+                // Current line (index 0)
                 currentLineView
-                    .opacity(kOpacityCur)
-                    .offset(y: kYOffsetCur)
+                    .opacity(1.0)
+                    .offset(y: 0)
             }
-            .frame(width: maxLineWidth, height: cylinderHeight)
+            .frame(width: maxLineWidth, height: cylinderHeight, alignment: .bottom)
             .padding(5)
             .clipped()
         }
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(theme.keyBackground.opacity(0.7))
+                .fill(theme.settingsInputBackgroundColor)
                 .stroke(theme.keyBorder, lineWidth: 1)
         )
         .onAppear {
@@ -97,14 +90,13 @@ struct TypingDisplayView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     Text(text)
                         .font(.system(size: fontSize, weight: .medium, design: .monospaced))
-                        .foregroundColor(theme.keyText)
+                        .foregroundColor(.white)
                 }
             } else {
                 Text(text)
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
-                    .foregroundColor(theme.keyText)
+                    .foregroundColor(.white)
             }
-            Spacer()
         }
         .frame(maxWidth: maxLineWidth, alignment: .leading)
         .frame(height: lineHeight)
@@ -120,7 +112,7 @@ struct TypingDisplayView: View {
                         HStack(spacing: 0) {
                             Text(typingLines.currentLine)
                                 .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
-                                .foregroundColor(theme.keyText)
+                                .foregroundColor(.white)
                                 .id("currentText")
                         }
                     }
@@ -133,9 +125,9 @@ struct TypingDisplayView: View {
                 }
             } else {
                 // Normal display for shorter lines
-                Text(typingLines.currentLine.isEmpty ? "Start typing..." : typingLines.currentLine)
+                Text(typingLines.currentLine.isEmpty ? "type something..." : typingLines.currentLine)
                     .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
-                    .foregroundColor(typingLines.currentLine.isEmpty ? theme.keyText.opacity(0.5) : theme.keyText)
+                    .foregroundColor(typingLines.currentLine.isEmpty ? Color.white.opacity(0.5) : .white)
             }
             Spacer()
         }
@@ -148,6 +140,6 @@ struct TypingDisplayView_Previews: PreviewProvider {
     static var previews: some View {
         TypingDisplayView()
             .environmentObject(KeyEventTap())
-            .frame(width: 400, height: 200)
+            .frame(width: 400, height: 100)
     }
 }

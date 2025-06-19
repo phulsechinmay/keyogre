@@ -8,8 +8,7 @@ import AppKit
 struct TypingLines {
     let currentLine: String
     let previousLine1: String  // Most recent previous line
-    let previousLine2: String  // Second previous line  
-    let previousLine3: String  // Third previous line
+    let previousLine2: String  // Second previous line
     let allText: String
 }
 
@@ -23,7 +22,7 @@ protocol KeyEventTapProtocol: ObservableObject {
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     let lastTenCharacters = CurrentValueSubject<[Character], Never>([])
-    let typingLines = CurrentValueSubject<TypingLines, Never>(TypingLines(currentLine: "", previousLine1: "", previousLine2: "", previousLine3: "", allText: ""))
+    let typingLines = CurrentValueSubject<TypingLines, Never>(TypingLines(currentLine: "", previousLine1: "", previousLine2: "", allText: ""))
     let pressedKeysSet = CurrentValueSubject<Set<CGKeyCode>, Never>([])
     
     private var localMonitor: Any?
@@ -242,46 +241,34 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         let currentLine: String
         let previousLine1: String
         let previousLine2: String
-        let previousLine3: String
         
         // Extract lines from most recent to oldest
-        if lines.count >= 4 {
-            // 4+ lines exist
+        if lines.count >= 3 {
+            // 3+ lines exist
             currentLine = lines.last ?? ""
             previousLine1 = lines[lines.count - 2]
             previousLine2 = lines[lines.count - 3]
-            previousLine3 = lines[lines.count - 4]
-        } else if lines.count == 3 {
-            // 3 lines exist
-            currentLine = lines.last ?? ""
-            previousLine1 = lines[lines.count - 2]
-            previousLine2 = lines[lines.count - 3]
-            previousLine3 = ""
         } else if lines.count == 2 {
             // 2 lines exist
             currentLine = lines.last ?? ""
             previousLine1 = lines[lines.count - 2]
             previousLine2 = ""
-            previousLine3 = ""
         } else if lines.count == 1 {
             // Only one line exists
             currentLine = lines[0]
             previousLine1 = ""
             previousLine2 = ""
-            previousLine3 = ""
         } else {
             // No lines
             currentLine = ""
             previousLine1 = ""
             previousLine2 = ""
-            previousLine3 = ""
         }
         
         let typingData = TypingLines(
             currentLine: currentLine,
             previousLine1: previousLine1,
             previousLine2: previousLine2,
-            previousLine3: previousLine3,
             allText: fullTextBuffer
         )
         

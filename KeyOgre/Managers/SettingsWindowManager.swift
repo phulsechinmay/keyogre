@@ -7,8 +7,8 @@ import AppKit
 class SettingsWindowManager: ObservableObject {
     private var settingsWindow: NSWindow?
     
-    private let windowWidth: CGFloat = 600
-    private let windowHeight: CGFloat = 400
+    private let windowWidth: CGFloat = 750
+    private let windowHeight: CGFloat = 550
     
     func showSettings() {
         if let window = settingsWindow {
@@ -57,7 +57,7 @@ class SettingsWindowManager: ObservableObject {
         window.contentViewController = hostingController
         window.title = "KeyOgre Settings"
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 500, height: 350)
+        window.minSize = NSSize(width: 650, height: 450)
         window.center()
         
         // Store reference and show

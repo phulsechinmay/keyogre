@@ -8,8 +8,8 @@ class DropdownWindowManager: ObservableObject {
     private var overlayWindow: NSWindow?
     @Published var isVisible = false
 
-    private let windowWidth: CGFloat = 800
-    private let windowHeight: CGFloat = 500
+    private let windowWidth: CGFloat = 900
+    private let windowHeight: CGFloat = 550
 
     // Create the overlay window in applicationDidFinishLaunching for fullscreen compatibility
     func createOverlayWindow(keyEventTap: KeyEventTap) {
