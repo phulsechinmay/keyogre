@@ -58,8 +58,8 @@ class ZMKKeymapParser {
         print("🔍 ZMKKeymapParser: Extracting layers from cleaned content...")
         
         // Improved pattern to match layer definitions after comment removal
-        // This will match: layer_name { ... bindings = < ... >; }
-        let layerPattern = #"(\w+_layer)\s*\{.*?bindings\s*=\s*<(.*?)>\s*;\s*\}"#
+        // This will match: layer_name { ... bindings = < ... >; } and stop at the first >;
+        let layerPattern = #"(\w+_layer)\s*\{.*?bindings\s*=\s*<(.*?)>\s*;"#
         let layerRegex = try NSRegularExpression(pattern: layerPattern, options: [.dotMatchesLineSeparators])
         let contentRange = NSRange(content.startIndex..<content.endIndex, in: content)
         
@@ -166,6 +166,59 @@ class ZMKKeymapParser {
             }
         } catch {
             print("Failed to parse keymap: \(error)")
+        }
+    }
+    
+    // Specific test for lily58 keymap
+    static func testLily58Keymap() {
+        let lily58Path = "/Users/phulsechinmay/Desktop/Projects/keyogre/KeyOgre/ZmkFiles/lily58.keymap"
+        print("🧪 Testing lily58.keymap parsing...")
+        testParsing(filePath: lily58Path)
+    }
+    
+    // Validation test to ensure no sensor-bindings contamination
+    static func validateKeymapFile(_ filePath: String, expectedLayers: Int? = nil, expectedBindingsPerLayer: Int? = nil) -> Bool {
+        do {
+            let keymap = try parseKeymap(from: filePath)
+            print("✅ Successfully parsed keymap: \(keymap.name)")
+            print("   Layers: \(keymap.layers.count)")
+            
+            // Check expected layer count
+            if let expected = expectedLayers {
+                if keymap.layers.count == expected {
+                    print("✅ Layer count matches expected (\(expected))")
+                } else {
+                    print("❌ Layer count mismatch - expected \(expected), got \(keymap.layers.count)")
+                    return false
+                }
+            }
+            
+            // Check each layer
+            for (index, layer) in keymap.layers.enumerated() {
+                print("   Layer \(index + 1): \(layer.displayName) - \(layer.bindings.count) bindings")
+                
+                // Check for sensor-bindings contamination
+                for binding in layer.bindings {
+                    if binding.contains("sensor-bindings") {
+                        print("❌ sensor-bindings contamination found in layer \(layer.displayName)")
+                        return false
+                    }
+                }
+                
+                // Check expected bindings count if provided
+                if let expectedCount = expectedBindingsPerLayer {
+                    if layer.bindings.count != expectedCount {
+                        print("❌ Layer \(layer.displayName) binding count mismatch - expected \(expectedCount), got \(layer.bindings.count)")
+                        return false
+                    }
+                }
+            }
+            
+            print("✅ No sensor-bindings contamination found")
+            return true
+        } catch {
+            print("❌ Failed to parse keymap: \(error)")
+            return false
         }
     }
 }

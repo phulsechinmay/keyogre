@@ -5,10 +5,11 @@ import Foundation
 import CoreGraphics
 import SwiftUI
 
-class ANSI60KeyboardLayout: ObservableObject {
+class ANSI60KeyboardLayout: ObservableObject, KeyboardLayout {
     let keys: [Key]
     let totalSize: CGSize
     let name: String = "ANSI 60%"
+    let displayName: String = "ANSI 60%"
     
     init(withColors: Bool = true) {
         // ANSI 60% layout dimensions and positioning

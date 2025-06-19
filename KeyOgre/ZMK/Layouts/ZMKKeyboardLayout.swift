@@ -5,7 +5,7 @@ import Foundation
 import CoreGraphics
 import SwiftUI
 
-class ZMKKeyboardLayout: ObservableObject {
+class ZMKKeyboardLayout: ObservableObject, KeyboardLayout {
     let keys: [Key]
     let totalSize: CGSize
     let name: String

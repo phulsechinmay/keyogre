@@ -110,12 +110,3 @@ class KeyboardProvider {
         return PresetKeyboardModel.allCases
     }
 }
-
-// Extension to make existing layouts conform to KeyboardLayout protocol
-extension ANSI60KeyboardLayout: KeyboardLayout {
-    var displayName: String { return name }
-}
-
-extension ZMKKeyboardLayout: KeyboardLayout {
-    // ZMKKeyboardLayout already has the required properties
-}
