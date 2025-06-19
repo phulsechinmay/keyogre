@@ -18,7 +18,7 @@ class DropdownWindowManager: ObservableObject {
         print("KeyOgre: Creating overlay window in applicationDidFinishLaunching")
 
         // Create the content view with close button
-        let dropdownContent = DropdownContentView(
+        let dropdownContent = MainContentView(
             keyEventTap: keyEventTap,
             onClose: { [weak self] in
                 self?.hideDropdown()
@@ -153,110 +153,3 @@ class DropdownWindowManager: ObservableObject {
     }
 }
 
-struct DropdownContentView: View {
-    @ObservedObject var keyEventTap: KeyEventTap
-    let onClose: () -> Void
-    private let theme = ColorTheme.defaultTheme
-    @StateObject private var keyboardLayoutManager = KeyboardLayoutManager.shared
-
-    var body: some View {
-        VStack(spacing: 0) {
-            // Header with close button
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("KeyOgre")
-                        .font(.headline)
-                        .foregroundColor(theme.keyText)
-
-                    Text("Press ⌘` to toggle")
-                        .font(.caption)
-                        .foregroundColor(theme.keyText.opacity(0.7))
-                }
-
-                Spacer()
-
-                Button(action: onClose) {
-                    ZStack {
-                        Circle()
-                            .fill(theme.keyBackground.opacity(0.8))
-                            .frame(width: 24, height: 24)
-
-                        Image(systemName: "xmark")
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(theme.keyText)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                .onHover { hovering in
-                    if hovering {
-                        NSCursor.pointingHand.push()
-                    } else {
-                        NSCursor.pop()
-                    }
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 16)
-            .padding(.bottom, 8)
-
-            // Main content
-            VStack(spacing: 20) {
-                TypingDisplayView()
-                    .environmentObject(keyEventTap)
-
-                KeyboardView()
-                    .environmentObject(keyEventTap)
-
-                // Keyboard selection dropdown
-                KeyboardSelectionView()
-            }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 20)
-        }
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(theme.windowBackground)
-        )
-        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-    }
-}
-
-struct KeyboardSelectionView: View {
-    @StateObject private var keyboardLayoutManager = KeyboardLayoutManager.shared
-    private let theme = ColorTheme.defaultTheme
-
-    var body: some View {
-        HStack {
-            Spacer()
-
-            Picker(
-                "Select Keyboard",
-                selection: Binding(
-                    get: { keyboardLayoutManager.selectedConfiguration?.id ?? UUID() },
-                    set: { selectedId in
-                        if let config = keyboardLayoutManager.availableConfigurations.first(where: {
-                            $0.id == selectedId
-                        }) {
-                            keyboardLayoutManager.switchToConfiguration(config)
-                        }
-                    }
-                )
-            ) {
-                ForEach(keyboardLayoutManager.availableConfigurations, id: \.id) { config in
-                    HStack {
-                        Image(systemName: "keyboard")
-                            .font(.system(size: 12))
-                        Text(config.name)
-                            .font(.system(size: 13))
-                    }
-                    .tag(config.id)
-                }
-            }
-            .pickerStyle(MenuPickerStyle())
-            .labelsHidden()
-            .frame(maxWidth: 200)
-
-            Spacer()
-        }
-    }
-}

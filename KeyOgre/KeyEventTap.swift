@@ -16,14 +16,20 @@ protocol KeyEventTapProtocol: ObservableObject {
     var lastTenCharacters: CurrentValueSubject<[Character], Never> { get }
     var typingLines: CurrentValueSubject<TypingLines, Never> { get }
     var pressedKeysSet: CurrentValueSubject<Set<CGKeyCode>, Never> { get }
+    var currentMode: CurrentValueSubject<MainWindowMode, Never> { get }
     func startMonitoring()
     func stopMonitoring()
+    func setCurrentMode(_ mode: MainWindowMode)
+    func registerCodingPracticeHandler(_ handler: @escaping (Character) -> Void)
+    func registerBackspaceHandler(_ handler: @escaping () -> Void)
+    func registerEnterHandler(_ handler: @escaping () -> Void)
 }
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     let lastTenCharacters = CurrentValueSubject<[Character], Never>([])
     let typingLines = CurrentValueSubject<TypingLines, Never>(TypingLines(currentLine: "", previousLine1: "", previousLine2: "", allText: ""))
     let pressedKeysSet = CurrentValueSubject<Set<CGKeyCode>, Never>([])
+    let currentMode = CurrentValueSubject<MainWindowMode, Never>(.freeform)
     
     private var localMonitor: Any?
     private var keyUpMonitor: Any?
@@ -31,6 +37,11 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     private var characterBuffer: [Character] = []
     private var fullTextBuffer: String = ""
     private var pressedKeys: Set<CGKeyCode> = []
+    
+    // Coding practice event handlers
+    private var codingPracticeCharacterHandler: ((Character) -> Void)?
+    private var backspaceHandler: (() -> Void)?
+    private var enterHandler: (() -> Void)?
     
     func startMonitoring() {
         print("KeyOgre: Starting local key monitoring...")
@@ -100,6 +111,14 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             
             // Publish the updated pressed keys set
             self.pressedKeysSet.send(self.pressedKeys)
+            
+            // Handle special keys for coding practice mode
+            if self.currentMode.value == .codingPractice {
+                if keyCode == 51 { // Backspace key
+                    self.backspaceHandler?()
+                    return
+                }
+            }
             
             // Add character to buffer
             if let char = character.first {
@@ -186,16 +205,28 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         }
         lastTenCharacters.send(characterBuffer)
         
-        // Handle newline characters specially (Enter key sends \r on macOS)
-        if character == "\r" || character == "\n" {
-            handleNewlineCharacter()
-        } else {
-            // Regular character - add to buffer
-            fullTextBuffer.append(character)
-            if fullTextBuffer.count > 200 {
-                fullTextBuffer.removeFirst()
+        // Route character based on current mode
+        let currentModeValue = currentMode.value
+        
+        if currentModeValue == .codingPractice {
+            // Handle coding practice mode
+            if character == "\r" || character == "\n" {
+                enterHandler?()
+            } else {
+                codingPracticeCharacterHandler?(character)
             }
-            updateTypingLines()
+        } else {
+            // Handle freeform mode (legacy behavior)
+            if character == "\r" || character == "\n" {
+                handleNewlineCharacter()
+            } else {
+                // Regular character - add to buffer
+                fullTextBuffer.append(character)
+                if fullTextBuffer.count > 200 {
+                    fullTextBuffer.removeFirst()
+                }
+                updateTypingLines()
+            }
         }
     }
     
@@ -273,5 +304,23 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         )
         
         typingLines.send(typingData)
+    }
+    
+    // MARK: - Mode Management
+    
+    func setCurrentMode(_ mode: MainWindowMode) {
+        currentMode.send(mode)
+    }
+    
+    func registerCodingPracticeHandler(_ handler: @escaping (Character) -> Void) {
+        codingPracticeCharacterHandler = handler
+    }
+    
+    func registerBackspaceHandler(_ handler: @escaping () -> Void) {
+        backspaceHandler = handler
+    }
+    
+    func registerEnterHandler(_ handler: @escaping () -> Void) {
+        enterHandler = handler
     }
 }

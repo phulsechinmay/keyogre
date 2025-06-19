@@ -10,6 +10,10 @@ struct ColorTheme {
     let keyText: Color
     let windowBackground: Color
     let settingsInputBackgroundColor: Color
+    let characterCorrect: Color
+    let characterIncorrect: Color
+    let characterUpcoming: Color
+    let characterCurrent: Color
     let name: String
     
     // Pastel Light theme (matches reference video)
@@ -20,6 +24,10 @@ struct ColorTheme {
         keyText: Color(red: 0.3, green: 0.3, blue: 0.4),
         windowBackground: Color(red: 0.98, green: 0.98, blue: 0.99),
         settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
+        characterCorrect: Color.green.opacity(0.8),
+        characterIncorrect: Color.red.opacity(0.8),
+        characterUpcoming: Color.gray.opacity(0.6),
+        characterCurrent: Color.blue.opacity(0.4),
         name: "Pastel Light"
     )
     
@@ -31,6 +39,10 @@ struct ColorTheme {
         keyText: Color(red: 0.15, green: 0.15, blue: 0.25, opacity: 0.9),
         windowBackground: Color(red: 0.95, green: 0.95, blue: 0.98, opacity: 0.5),
         settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
+        characterCorrect: Color.green.opacity(0.8),
+        characterIncorrect: Color.red.opacity(0.8),
+        characterUpcoming: Color.gray.opacity(0.6),
+        characterCurrent: Color.blue.opacity(0.4),
         name: "Translucent Light"
     )
     
@@ -42,6 +54,10 @@ struct ColorTheme {
         keyText: Color(red: 0.85, green: 0.85, blue: 0.88),
         windowBackground: Color(red: 0.20, green: 0.20, blue: 0.22),
         settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
+        characterCorrect: Color.green.opacity(0.8),
+        characterIncorrect: Color.red.opacity(0.8),
+        characterUpcoming: Color.gray.opacity(0.6),
+        characterCurrent: Color.blue.opacity(0.4),
         name: "Pastel Dark"
     )
     
@@ -53,6 +69,10 @@ struct ColorTheme {
         keyText: Color(red: 0.9, green: 0.9, blue: 0.95, opacity: 0.95),
         windowBackground: Color(red: 0.231, green: 0.231, blue: 0.227), // Color(red: 0.29, green: 0.33, blue: 0.41, opacity: 0.7),
         settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
+        characterCorrect: Color.green.opacity(0.8),
+        characterIncorrect: Color.red.opacity(0.8),
+        characterUpcoming: Color.gray.opacity(0.6),
+        characterCurrent: Color.blue.opacity(0.4),
         name: "Translucent Dark"
     )
     
@@ -64,6 +84,10 @@ struct ColorTheme {
         keyText: Color.black,
         windowBackground: Color.white,
         settingsInputBackgroundColor: Color(red: 0.231, green: 0.231, blue: 0.227),
+        characterCorrect: Color.green.opacity(0.8),
+        characterIncorrect: Color.red.opacity(0.8),
+        characterUpcoming: Color.gray.opacity(0.6),
+        characterCurrent: Color.blue.opacity(0.4),
         name: "High Contrast"
     )
     

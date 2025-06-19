@@ -43,16 +43,22 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B3CE7AE52DFF3E1F004A5A28 /* KeyOgre */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = KeyOgre;
 			sourceTree = "<group>";
 		};
 		B3CE7AF42DFF3E20004A5A28 /* KeyOgreTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = KeyOgreTests;
 			sourceTree = "<group>";
 		};
 		B3CE7AFE2DFF3E20004A5A28 /* KeyOgreUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = KeyOgreUITests;
 			sourceTree = "<group>";
 		};
@@ -294,13 +300,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KeyOgre/Pods-KeyOgre-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KeyOgre/Pods-KeyOgre-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
