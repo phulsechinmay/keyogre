@@ -92,8 +92,9 @@ class DropdownWindowManager: ObservableObject {
         // Set initial position (off-screen)
         window.setFrame(NSRect(x: windowX, y: startY, width: windowWidth, height: windowHeight), display: false)
         
-        // Show window and animate
+        // Show window and activate app to bring it into focus
         window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
         isVisible = true
         print("KeyOgre: ✅ Window shown successfully")
         
@@ -133,6 +134,8 @@ class DropdownWindowManager: ObservableObject {
             print("KeyOgre: Hide animation completed")
             // Hide window but keep it available for reuse (critical for fullscreen overlay)
             window.orderOut(nil)
+            // Return focus to the previously active application
+            NSApp.hide(nil)
         }
     }
     
