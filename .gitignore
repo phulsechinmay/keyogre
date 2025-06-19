@@ -2,6 +2,7 @@
 *.DS_Store
 todos.md
 CLAUDE.md
+issues.md
 
 ## Build generated
 build/
