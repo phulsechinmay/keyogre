@@ -5,8 +5,17 @@ import Foundation
 import Combine
 import AppKit
 
+struct TypingLines {
+    let currentLine: String
+    let previousLine1: String  // Most recent previous line
+    let previousLine2: String  // Second previous line  
+    let previousLine3: String  // Third previous line
+    let allText: String
+}
+
 protocol KeyEventTapProtocol: ObservableObject {
     var lastTenCharacters: CurrentValueSubject<[Character], Never> { get }
+    var typingLines: CurrentValueSubject<TypingLines, Never> { get }
     var pressedKeysSet: CurrentValueSubject<Set<CGKeyCode>, Never> { get }
     func startMonitoring()
     func stopMonitoring()
@@ -14,12 +23,14 @@ protocol KeyEventTapProtocol: ObservableObject {
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     let lastTenCharacters = CurrentValueSubject<[Character], Never>([])
+    let typingLines = CurrentValueSubject<TypingLines, Never>(TypingLines(currentLine: "", previousLine1: "", previousLine2: "", previousLine3: "", allText: ""))
     let pressedKeysSet = CurrentValueSubject<Set<CGKeyCode>, Never>([])
     
     private var localMonitor: Any?
     private var keyUpMonitor: Any?
     private var flagsMonitor: Any?
     private var characterBuffer: [Character] = []
+    private var fullTextBuffer: String = ""
     private var pressedKeys: Set<CGKeyCode> = []
     
     func startMonitoring() {
@@ -169,10 +180,111 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     }
     
     private func addCharacterToBuffer(_ character: Character) {
+        // Legacy 10-character buffer for backward compatibility
         characterBuffer.append(character)
         if characterBuffer.count > 10 {
             characterBuffer.removeFirst()
         }
         lastTenCharacters.send(characterBuffer)
+        
+        // Handle newline characters specially (Enter key sends \r on macOS)
+        if character == "\r" || character == "\n" {
+            handleNewlineCharacter()
+        } else {
+            // Regular character - add to buffer
+            fullTextBuffer.append(character)
+            if fullTextBuffer.count > 200 {
+                fullTextBuffer.removeFirst()
+            }
+            updateTypingLines()
+        }
+    }
+    
+    private func handleNewlineCharacter() {
+        // Get current line before processing newline
+        let lines = fullTextBuffer.components(separatedBy: "\n")
+        let currentLineBeforeEnter = lines.last ?? ""
+        
+        print("KeyOgre: Enter pressed, current line: '\(currentLineBeforeEnter)'")
+        
+        // Check if current line is empty or contains only whitespace
+        let trimmedCurrentLine = currentLineBeforeEnter.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmedCurrentLine.isEmpty {
+            // Current line is empty/whitespace - clear it but don't change previous line
+            if lines.count > 1 {
+                // Keep all lines except the last (current) one
+                let previousLines = Array(lines.dropLast())
+                fullTextBuffer = previousLines.joined(separator: "\n")
+                if !previousLines.isEmpty {
+                    fullTextBuffer += "\n"
+                }
+            } else {
+                // Only one line and it's empty - clear everything
+                fullTextBuffer = ""
+            }
+            print("KeyOgre: Cleared empty line, buffer: '\(fullTextBuffer)'")
+        } else {
+            // Current line has content - add newline to create new line
+            fullTextBuffer.append("\n")
+            if fullTextBuffer.count > 200 {
+                fullTextBuffer.removeFirst()
+            }
+            print("KeyOgre: Added newline, buffer: '\(fullTextBuffer)'")
+        }
+        
+        updateTypingLines()
+    }
+    
+    private func updateTypingLines() {
+        let lines = fullTextBuffer.components(separatedBy: "\n")
+        
+        let currentLine: String
+        let previousLine1: String
+        let previousLine2: String
+        let previousLine3: String
+        
+        // Extract lines from most recent to oldest
+        if lines.count >= 4 {
+            // 4+ lines exist
+            currentLine = lines.last ?? ""
+            previousLine1 = lines[lines.count - 2]
+            previousLine2 = lines[lines.count - 3]
+            previousLine3 = lines[lines.count - 4]
+        } else if lines.count == 3 {
+            // 3 lines exist
+            currentLine = lines.last ?? ""
+            previousLine1 = lines[lines.count - 2]
+            previousLine2 = lines[lines.count - 3]
+            previousLine3 = ""
+        } else if lines.count == 2 {
+            // 2 lines exist
+            currentLine = lines.last ?? ""
+            previousLine1 = lines[lines.count - 2]
+            previousLine2 = ""
+            previousLine3 = ""
+        } else if lines.count == 1 {
+            // Only one line exists
+            currentLine = lines[0]
+            previousLine1 = ""
+            previousLine2 = ""
+            previousLine3 = ""
+        } else {
+            // No lines
+            currentLine = ""
+            previousLine1 = ""
+            previousLine2 = ""
+            previousLine3 = ""
+        }
+        
+        let typingData = TypingLines(
+            currentLine: currentLine,
+            previousLine1: previousLine1,
+            previousLine2: previousLine2,
+            previousLine3: previousLine3,
+            allText: fullTextBuffer
+        )
+        
+        typingLines.send(typingData)
     }
 }

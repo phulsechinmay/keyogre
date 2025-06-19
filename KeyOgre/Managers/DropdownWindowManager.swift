@@ -201,7 +201,7 @@ struct DropdownContentView: View {
 
             // Main content
             VStack(spacing: 20) {
-                LastTenView()
+                TypingDisplayView()
                     .environmentObject(keyEventTap)
 
                 KeyboardView()
