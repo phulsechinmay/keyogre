@@ -29,18 +29,6 @@ class CodingPracticeManager: ObservableObject {
         // Always advance position regardless of correctness
         progress.currentCharIndex += 1
         
-        // Check if line is complete
-        if progress.currentCharIndex >= currentLine.count {
-            // Move to next line
-            progress.currentLineIndex += 1
-            progress.currentCharIndex = 0
-            
-            // Check if all content is complete
-            if progress.currentLineIndex >= currentContent.count {
-                progress.isComplete = true
-            }
-        }
-        
         state.updateCurrentProgress(progress)
     }
     
@@ -78,19 +66,57 @@ class CodingPracticeManager: ObservableObject {
     func processEnterKey() {
         state.ensureLanguageProgressExists()
         let currentContent = getCurrentContent()
-        guard state.getCurrentProgress().currentLineIndex < currentContent.count else { return }
-        
-        let currentLine = currentContent[state.getCurrentProgress().currentLineIndex]
         var progress = state.getCurrentProgress()
         
-        // Only allow enter if we've typed the complete line correctly
-        if progress.currentCharIndex >= currentLine.count {
+        // Check if we're at the end of content
+        guard progress.currentLineIndex < currentContent.count else { return }
+        
+        let currentLine = currentContent[progress.currentLineIndex]
+        
+        // Allow enter if we've typed the complete line or if it's an empty line
+        if progress.currentCharIndex >= currentLine.count || currentLine.isEmpty {
             progress.currentLineIndex += 1
             progress.currentCharIndex = 0
             
             // Check if all content is complete
             if progress.currentLineIndex >= currentContent.count {
                 progress.isComplete = true
+            }
+            
+            state.updateCurrentProgress(progress)
+        }
+    }
+    
+    func processTabKey() {
+        state.ensureLanguageProgressExists()
+        let currentContent = getCurrentContent()
+        guard state.getCurrentProgress().currentLineIndex < currentContent.count else { return }
+        
+        let currentLine = currentContent[state.getCurrentProgress().currentLineIndex]
+        var progress = state.getCurrentProgress()
+        
+        // Check if we're at the beginning of expected indentation
+        let expectedIndentation = getExpectedIndentation(for: currentLine)
+        
+        // Only process tab if we're within the expected indentation and at the right position
+        if progress.currentCharIndex < expectedIndentation && 
+           progress.currentCharIndex % 4 == 0 { // Assuming 4-space indentation
+            
+            // Add 4 space characters for the tab
+            for _ in 0..<4 {
+                if progress.currentCharIndex < currentLine.count {
+                    let expectedChar = currentLine[currentLine.index(currentLine.startIndex, offsetBy: progress.currentCharIndex)]
+                    if expectedChar == " " {
+                        let characterResult = CharacterResult(character: " ", isCorrect: true, timestamp: Date())
+                        progress.addCharacterResult(characterResult, lineIndex: progress.currentLineIndex)
+                        progress.currentCharIndex += 1
+                    } else {
+                        // Stop if we hit a non-space character
+                        break
+                    }
+                } else {
+                    break
+                }
             }
             
             state.updateCurrentProgress(progress)
@@ -210,7 +236,8 @@ class CodingPracticeManager: ObservableObject {
         guard progress.currentLineIndex < currentContent.count else { return false }
         
         let currentLine = currentContent[progress.currentLineIndex]
-        return progress.currentCharIndex >= currentLine.count
+        // Show enter indicator if line is complete or if it's an empty line
+        return progress.currentCharIndex >= currentLine.count || currentLine.isEmpty
     }
     
     private func getCurrentCharacterToType() -> Character? {
@@ -223,5 +250,17 @@ class CodingPracticeManager: ObservableObject {
         guard progress.currentCharIndex < currentLine.count else { return nil }
         
         return currentLine[currentLine.index(currentLine.startIndex, offsetBy: progress.currentCharIndex)]
+    }
+    
+    private func getExpectedIndentation(for line: String) -> Int {
+        var indentationCount = 0
+        for char in line {
+            if char == " " {
+                indentationCount += 1
+            } else {
+                break
+            }
+        }
+        return indentationCount
     }
 }

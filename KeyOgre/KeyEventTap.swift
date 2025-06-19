@@ -23,6 +23,7 @@ protocol KeyEventTapProtocol: ObservableObject {
     func registerCodingPracticeHandler(_ handler: @escaping (Character) -> Void)
     func registerBackspaceHandler(_ handler: @escaping () -> Void)
     func registerEnterHandler(_ handler: @escaping () -> Void)
+    func registerTabHandler(_ handler: @escaping () -> Void)
 }
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
@@ -42,6 +43,7 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     private var codingPracticeCharacterHandler: ((Character) -> Void)?
     private var backspaceHandler: (() -> Void)?
     private var enterHandler: (() -> Void)?
+    private var tabHandler: (() -> Void)?
     
     func startMonitoring() {
         print("KeyOgre: Starting local key monitoring...")
@@ -116,6 +118,9 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             if self.currentMode.value == .codingPractice {
                 if keyCode == 51 { // Backspace key
                     self.backspaceHandler?()
+                    return
+                } else if keyCode == 48 { // Tab key
+                    self.tabHandler?()
                     return
                 }
             }
@@ -322,5 +327,9 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     
     func registerEnterHandler(_ handler: @escaping () -> Void) {
         enterHandler = handler
+    }
+    
+    func registerTabHandler(_ handler: @escaping () -> Void) {
+        tabHandler = handler
     }
 }

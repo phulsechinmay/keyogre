@@ -75,6 +75,9 @@ struct CodingPracticeView: View {
             keyEventTap.registerEnterHandler {
                 codingPracticeManager.processEnterKey()
             }
+            keyEventTap.registerTabHandler {
+                codingPracticeManager.processTabKey()
+            }
         }
     }
 }
@@ -135,7 +138,7 @@ struct CodingTypingDisplayView: View {
                 
                 // Current line (index 2 - center line)
                 if displayData.lines.count > 2 {
-                    currentLineView(text: displayData.lines[2], highlights: displayData.highlights[2] ?? [])
+                    currentLineView(text: displayData.lines[2], highlights: displayData.highlights[2] ?? [], showEnterIndicator: codingPracticeManager.getDisplayData().showEnterIndicator)
                         .opacity(1.0)
                         .offset(y: 0)
                 }
@@ -319,12 +322,23 @@ struct CodingTypingDisplayView: View {
     }
     
     // Current line - most prominent with highlighting
-    private func currentLineView(text: String, highlights: [CharacterHighlight]) -> some View {
+    private func currentLineView(text: String, highlights: [CharacterHighlight], showEnterIndicator: Bool) -> some View {
         HStack(alignment: .center, spacing: 0) {
             if text.isEmpty {
-                Text("Ready to practice...")
-                    .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
-                    .foregroundColor(Color.white.opacity(0.5))
+                if showEnterIndicator {
+                    HStack(spacing: 8) {
+                        Image(systemName: "return")
+                            .font(.system(size: fontSize, weight: .semibold))
+                            .foregroundColor(Color.blue.opacity(0.8))
+                        Text("Press Enter to continue")
+                            .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
+                            .foregroundColor(Color.white.opacity(0.7))
+                    }
+                } else {
+                    Text("Ready to practice...")
+                        .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
+                        .foregroundColor(Color.white.opacity(0.5))
+                }
             } else if highlights.isEmpty {
                 // No highlighting - just display text
                 Text(text)
@@ -339,6 +353,15 @@ struct CodingTypingDisplayView: View {
                     fontSize: fontSize,
                     fontWeight: .semibold
                 )
+                
+                // Show enter icon at the end of completed lines
+                if showEnterIndicator {
+                    Spacer()
+                    Image(systemName: "return")
+                        .font(.system(size: fontSize, weight: .semibold))
+                        .foregroundColor(Color.blue.opacity(0.8))
+                        .padding(.leading, 8)
+                }
             }
             Spacer()
         }
