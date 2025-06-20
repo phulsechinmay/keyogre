@@ -1,30 +1,35 @@
-// ABOUTME: Language selection and control bar for coding practice mode
-// ABOUTME: Horizontal layout with language picker and restart button positioned above typing view
+// ABOUTME: Generic practice control bar component for language/text selection and restart functionality
+// ABOUTME: Horizontal layout with picker and restart button, reusable for coding and typing practice modes
 
 import SwiftUI
 
-struct LanguageControlBar: View {
-    @ObservedObject var codingPracticeManager: CodingPracticeManager
+struct PracticeControlBar<T: PracticeControlOption & Hashable & CaseIterable & Identifiable>: View {
+    @Binding var selectedOption: T
+    let onRestart: () -> Void
+    let showIcons: Bool
     private let theme = ColorTheme.defaultTheme
+    
+    init(selectedOption: Binding<T>, onRestart: @escaping () -> Void, showIcons: Bool = true) {
+        self._selectedOption = selectedOption
+        self.onRestart = onRestart
+        self.showIcons = showIcons
+    }
     
     var body: some View {
         HStack(spacing: 4) {
-            // Language selection
+            // Option selection
             HStack(spacing: 8) {
-                Picker("", selection: Binding(
-                    get: { codingPracticeManager.state.currentLanguage },
-                    set: { newLanguage in
-                        codingPracticeManager.switchLanguage(to: newLanguage)
-                    }
-                )) {
-                    ForEach(ProgrammingLanguage.allCases) { language in
+                Picker("", selection: $selectedOption) {
+                    ForEach(Array(T.allCases), id: \.self) { option in
                         HStack {
-                            Image(systemName: language.icon)
-                                .font(.system(size: 12))
-                            Text(language.rawValue)
+                            if showIcons {
+                                Image(systemName: option.icon)
+                                    .font(.system(size: 12))
+                            }
+                            Text(option.displayName)
                                 .font(.system(size: 13))
                         }
-                        .tag(language)
+                        .tag(option)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -34,9 +39,7 @@ struct LanguageControlBar: View {
             Spacer()
             
             // Restart button
-            Button(action: {
-                codingPracticeManager.restartCurrentLanguage()
-            }) {
+            Button(action: onRestart) {
                 HStack(spacing: 6) {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 13, weight: .medium))
@@ -68,9 +71,42 @@ struct LanguageControlBar: View {
         )
         .frame(width: 200)
     }
+}
+
+struct LanguageControlBar: View {
+    @ObservedObject var codingPracticeManager: CodingPracticeManager
     
-    private func getTotalLines() -> Int {
-        let practiceContent = CodingPracticeContent()
-        return practiceContent.getCodeLines(for: codingPracticeManager.state.currentLanguage).count
+    var body: some View {
+        PracticeControlBar(
+            selectedOption: Binding(
+                get: { codingPracticeManager.state.currentLanguage },
+                set: { newLanguage in
+                    codingPracticeManager.switchLanguage(to: newLanguage)
+                }
+            ),
+            onRestart: {
+                codingPracticeManager.restartCurrentLanguage()
+            },
+            showIcons: true
+        )
+    }
+}
+
+struct TypingControlBar: View {
+    @ObservedObject var typingPracticeManager: TypingPracticeManager
+    
+    var body: some View {
+        PracticeControlBar(
+            selectedOption: Binding(
+                get: { typingPracticeManager.state.currentTextType },
+                set: { newTextType in
+                    typingPracticeManager.switchTextType(to: newTextType)
+                }
+            ),
+            onRestart: {
+                typingPracticeManager.restartCurrentTextType()
+            },
+            showIcons: false
+        )
     }
 }

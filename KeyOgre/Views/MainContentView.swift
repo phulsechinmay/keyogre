@@ -30,10 +30,14 @@ struct MainContentView: View {
             // Main content area - unified layout
             VStack(spacing: 12) {
 
-                // Language controls (only for coding practice)
+                // Practice controls (conditional based on mode)
                 if selectedMode == .codingPractice {
                     LanguageControlBar(
                         codingPracticeManager: codingPracticeManager
+                    )
+                } else if selectedMode == .typingPractice {
+                    TypingControlBar(
+                        typingPracticeManager: typingPracticeManager
                     )
                 }
 
@@ -361,9 +365,7 @@ struct MainContentView: View {
             keyEventTap.registerBackspaceHandler {
                 typingPracticeManager.processBackspace()
             }
-            keyEventTap.registerEnterHandler {
-                typingPracticeManager.processEnterKey()
-            }
+            keyEventTap.registerEnterHandler(nil) // No enter handling - auto-advance
             keyEventTap.registerTabHandler(nil) // No tab handling for typing practice
 
             // Start analytics session when switching to typing practice

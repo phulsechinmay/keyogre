@@ -13,6 +13,48 @@ class TypingPracticeManager: ObservableObject {
         generateWordLines()
     }
     
+    func switchTextType(to textType: TypingTextType) {
+        // End current analytics session if active
+        if analyticsManager.isSessionActive {
+            let _ = analyticsManager.endSession()
+        }
+        
+        // Update the text type and regenerate content
+        state.currentTextType = textType
+        generateWordLines()
+        
+        // Reset progress
+        state.currentLineIndex = 0
+        state.currentCharIndex = 0
+        state.wordLineProgress = [:]
+        state.isComplete = false
+        
+        // Start new analytics session
+        startAnalyticsSession()
+        
+        // Trigger UI update
+        objectWillChange.send()
+    }
+    
+    func restartCurrentTextType() {
+        // End current analytics session if active
+        if analyticsManager.isSessionActive {
+            let _ = analyticsManager.endSession()
+        }
+        
+        // Keep the same text type but regenerate content and reset progress
+        let currentTextType = state.currentTextType
+        state = TypingPracticeState()
+        state.currentTextType = currentTextType
+        generateWordLines()
+        
+        // Start new analytics session
+        startAnalyticsSession()
+        
+        // Trigger UI update
+        objectWillChange.send()
+    }
+    
     func processKeyInput(_ character: Character) {
         state.ensureLineProgressExists()
         guard state.currentLineIndex < state.wordLines.count else { return }
@@ -36,8 +78,31 @@ class TypingPracticeManager: ObservableObject {
         // Always advance position regardless of correctness
         state.currentCharIndex += 1
         
-        // Update state and trigger UI update
-        state.updateCurrentProgress(progress)
+        // Check if we've reached the end of the current line
+        if state.currentCharIndex >= currentLine.fullText.count {
+            // Auto-advance to next line
+            progress.isComplete = true
+            state.updateCurrentProgress(progress)
+            
+            // Move to next line
+            state.currentLineIndex += 1
+            state.currentCharIndex = 0
+            
+            // Check if all content is complete
+            if state.currentLineIndex >= state.wordLines.count {
+                state.isComplete = true
+                // End analytics session when practice is complete
+                let _ = analyticsManager.endSession()
+            } else {
+                // Send line completion to analytics for the completed line
+                analyticsManager.processLineCompletion()
+            }
+        } else {
+            // Update current line progress
+            state.updateCurrentProgress(progress)
+        }
+        
+        // Trigger UI update
         objectWillChange.send()
     }
     
@@ -74,39 +139,7 @@ class TypingPracticeManager: ObservableObject {
         objectWillChange.send()
     }
     
-    func processEnterKey() {
-        state.ensureLineProgressExists()
-        var progress = state.getCurrentProgress()
-        
-        // Check if we're at the end of content
-        guard state.currentLineIndex < state.wordLines.count else { return }
-        
-        let currentLine = state.wordLines[state.currentLineIndex]
-        
-        // Allow enter if we've typed the complete line
-        if state.currentCharIndex >= currentLine.fullText.count {
-            // Send line completion to analytics
-            analyticsManager.processLineCompletion()
-            
-            // Mark current line as complete
-            progress.isComplete = true
-            state.updateCurrentProgress(progress)
-            
-            // Move to next line
-            state.currentLineIndex += 1
-            state.currentCharIndex = 0
-            
-            // Check if all content is complete
-            if state.currentLineIndex >= state.wordLines.count {
-                state.isComplete = true
-                // End analytics session when practice is complete
-                let _ = analyticsManager.endSession()
-            }
-        }
-        
-        // Trigger UI update
-        objectWillChange.send()
-    }
+    // Note: Enter key handling removed - lines auto-advance when complete
     
     func getDisplayData() -> TypingDisplayData {
         let progress = state.getCurrentProgress()
@@ -147,13 +180,12 @@ class TypingPracticeManager: ObservableObject {
             }
         }
         
-        let showEnterIndicator = shouldShowEnterIndicator()
         let currentChar = getCurrentCharacterToType()
         
         return TypingDisplayData(
             allLines: allLines,
             highlights: highlights,
-            showEnterIndicator: showEnterIndicator,
+            showEnterIndicator: false, // No longer needed - auto-advance
             currentCharacter: currentChar
         )
     }
@@ -190,7 +222,7 @@ class TypingPracticeManager: ObservableObject {
     // MARK: - Private Methods
     
     private func generateWordLines() {
-        state.wordLines = TypingPracticeContent.generateWordLines(count: 50)
+        state.wordLines = TypingPracticeContent.generateLines(for: state.currentTextType)
     }
     
     private func generateHighlightsForCompletedLine(lineIndex: Int) -> [CharacterHighlight] {
@@ -236,13 +268,7 @@ class TypingPracticeManager: ObservableObject {
         return highlights
     }
     
-    private func shouldShowEnterIndicator() -> Bool {
-        guard state.currentLineIndex < state.wordLines.count else { return false }
-        
-        let currentLine = state.wordLines[state.currentLineIndex]
-        // Show enter indicator if line is complete
-        return state.currentCharIndex >= currentLine.fullText.count
-    }
+    // Note: shouldShowEnterIndicator removed - no longer needed with auto-advance
     
     private func getCurrentCharacterToType() -> Character? {
         guard state.currentLineIndex < state.wordLines.count else { return nil }

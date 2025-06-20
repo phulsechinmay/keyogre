@@ -25,9 +25,9 @@ struct TypingPracticeView: View {
             keyEventTap.registerBackspaceHandler {
                 typingPracticeManager.processBackspace()
             }
-            keyEventTap.registerEnterHandler {
-                typingPracticeManager.processEnterKey()
-            }
+//            keyEventTap.registerEnterHandler {
+//                typingPracticeManager.processEnterKey()
+//            }
             // Note: No tab handler needed for typing practice (unlike coding practice)
             
             // Start analytics session when view appears
@@ -179,11 +179,11 @@ struct TypingPracticeDisplayView: View {
                             .foregroundColor(Color.white.opacity(0.7))
                     }
                 } else {
-                    Text("Ready to practice words...")
+                    Text("Ready to start typing...")
                         .font(.system(size: fontSize, weight: .semibold, design: .monospaced))
                         .foregroundColor(Color.white.opacity(0.5))
                 }
-            } else if text == "Word Practice Complete! 🎉" {
+            } else if text == "Practice Complete! 🎉" {
                 // Special handling for completion message
                 Text(text)
                     .font(.system(size: fontSize, weight: .semibold, design: .monospaced))

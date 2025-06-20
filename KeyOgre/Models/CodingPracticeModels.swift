@@ -34,6 +34,12 @@ enum ProgrammingLanguage: String, CaseIterable, Identifiable {
     }
 }
 
+extension ProgrammingLanguage: PracticeControlOption {
+    var displayName: String {
+        return rawValue
+    }
+}
+
 enum MainWindowMode: String, CaseIterable {
     case freeform = "Freeform"
     case codingPractice = "Coding Practice"

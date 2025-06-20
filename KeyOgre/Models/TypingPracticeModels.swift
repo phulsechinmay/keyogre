@@ -10,6 +10,26 @@ enum DifficultyLevel: String, CaseIterable {
     case advanced = "Advanced"
 }
 
+enum TypingTextType: String, CaseIterable, Identifiable {
+    case randomWords = "Random words"
+    case hamlet = "Hamlet"
+    
+    var id: String { rawValue }
+    
+    var displayName: String {
+        return rawValue
+    }
+    
+    var icon: String {
+        switch self {
+        case .randomWords: return "textformat.abc"
+        case .hamlet: return "theatermasks"
+        }
+    }
+}
+
+extension TypingTextType: PracticeControlOption {}
+
 struct WordLine {
     let words: [String]
     let fullText: String // Joined with spaces
@@ -25,6 +45,7 @@ struct WordLine {
 }
 
 struct TypingPracticeState {
+    var currentTextType: TypingTextType = .randomWords
     var currentLineIndex: Int = 0
     var currentCharIndex: Int = 0
     var wordLines: [WordLine] = []
