@@ -58,9 +58,14 @@ struct MainContentView: View {
                 }
 
                 // Bottom row - keyboard (always visible, independent of mode)
-                KeyboardView()
-                    .environmentObject(keyEventTap)
-                    .environmentObject(keyboardLayoutManager)
+                VStack(spacing: 8) {
+                    KeyboardView()
+                        .environmentObject(keyEventTap)
+                        .environmentObject(keyboardLayoutManager)
+                    
+                    // Keyboard selection dropdown
+                    KeyboardSelectionView()
+                }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)

@@ -9,7 +9,7 @@ struct CompactModeTabBar: View {
     
     var body: some View {
         VStack(spacing: 6) {
-            ForEach(MainWindowMode.allCases, id: \.self) { mode in
+            ForEach(MainWindowMode.visibleCases, id: \.self) { mode in
                 CompactModeTabButton(
                     mode: mode,
                     isSelected: selectedMode == mode,

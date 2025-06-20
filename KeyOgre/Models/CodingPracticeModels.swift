@@ -46,6 +46,11 @@ enum MainWindowMode: String, CaseIterable {
         case .typingPractice: return "keyboard"
         }
     }
+    
+    // Only show coding practice and typing practice in the tabbar
+    static var visibleCases: [MainWindowMode] {
+        return [.codingPractice, .typingPractice]
+    }
 }
 
 struct CodingPracticeState {

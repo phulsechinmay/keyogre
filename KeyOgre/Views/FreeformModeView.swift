@@ -7,16 +7,8 @@ struct FreeformModeView: View {
     @EnvironmentObject var keyEventTap: KeyEventTap
     
     var body: some View {
-        VStack(spacing: 20) {
-            TypingDisplayView()
-                .environmentObject(keyEventTap)
-            
-            KeyboardView()
-                .environmentObject(keyEventTap)
-            
-            // Keyboard selection dropdown
-            KeyboardSelectionView()
-        }
+        TypingDisplayView()
+            .environmentObject(keyEventTap)
     }
 }
 
