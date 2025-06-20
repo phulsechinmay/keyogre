@@ -1,5 +1,5 @@
 // ABOUTME: iOS calendar picker-style UI displaying typing history with true 3D cylinder effect
-// ABOUTME: Shows 3 lines total - current line prominent, 2 previous lines with progressive rotation
+// ABOUTME: Shows 5 lines total - current line prominent, 2 previous + 2 decorative lines with progressive rotation
 
 import SwiftUI
 import Combine
@@ -13,7 +13,7 @@ struct TypingDisplayView: View {
     private let theme = ColorTheme.defaultTheme
     private let maxLineWidth: CGFloat = 350
     private let lineHeight: CGFloat = 24
-    private let cylinderHeight: CGFloat = 60
+    private let cylinderHeight: CGFloat = 140 // Increased for 5 lines visibility
     private let lineSpacing: CGFloat = 20  // Equal spacing between all lines
     private let fontSize: CGFloat = 18     // Same font size for all lines
     
@@ -60,8 +60,32 @@ struct TypingDisplayView: View {
                 currentLineView
                     .opacity(1.0)
                     .offset(y: 0)
+                
+                // 1st next line (constant string)
+                constantLineView(text: "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", fontSize: fontSize)
+                    .rotation3DEffect(.degrees(-baseXRotation),
+                                      axis: (x: 1, y: 0, z: 0),
+                                      anchor: .center,
+                                      perspective: perspective)
+                    .rotation3DEffect(.degrees(-baseYRotation),
+                                      axis: (x: 0, y: 1, z: 0),
+                                      perspective: perspective)
+                    .opacity(1.0 - baseOpacity)
+                    .offset(y: -baseYOffset)
+                
+                // 2nd next line (constant string)
+                constantLineView(text: "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", fontSize: fontSize)
+                    .rotation3DEffect(.degrees(-baseXRotation * 2),
+                                      axis: (x: 1, y: 0, z: 0),
+                                      anchor: .center,
+                                      perspective: perspective)
+                    .rotation3DEffect(.degrees(-baseYRotation * 2),
+                                      axis: (x: 0, y: 1, z: 0),
+                                      perspective: perspective)
+                    .opacity(1.0 - (baseOpacity * 2))
+                    .offset(y: -baseYOffset * 1.85)
             }
-            .frame(width: maxLineWidth, height: cylinderHeight, alignment: .bottom)
+            .frame(width: maxLineWidth, height: cylinderHeight, alignment: .center)
             .padding(5)
             .clipped()
         }
@@ -97,6 +121,17 @@ struct TypingDisplayView: View {
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundColor(.white)
             }
+        }
+        .frame(maxWidth: maxLineWidth, alignment: .leading)
+        .frame(height: lineHeight)
+    }
+    
+    // Constant line view for the decorative lines below current line
+    private func constantLineView(text: String, fontSize: CGFloat) -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Text(text)
+                .font(.system(size: fontSize, weight: .medium, design: .monospaced))
+                .foregroundColor(Color.white.opacity(0.4)) // Muted color for constant lines
         }
         .frame(maxWidth: maxLineWidth, alignment: .leading)
         .frame(height: lineHeight)

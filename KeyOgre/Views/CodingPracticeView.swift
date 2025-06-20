@@ -4,59 +4,12 @@
 import SwiftUI
 
 struct CodingPracticeView: View {
-    @StateObject private var codingPracticeManager = CodingPracticeManager()
+    @EnvironmentObject var codingPracticeManager: CodingPracticeManager
     @EnvironmentObject var keyEventTap: KeyEventTap
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Language controls
-            HStack {
-                Spacer()
-                
-                Picker("", selection: Binding(
-                    get: { codingPracticeManager.state.currentLanguage },
-                    set: { newLanguage in
-                        codingPracticeManager.switchLanguage(to: newLanguage)
-                    }
-                )) {
-                    ForEach(ProgrammingLanguage.allCases) { language in
-                        HStack {
-                            Image(systemName: language.icon)
-                                .font(.system(size: 12))
-                            Text(language.rawValue)
-                                .font(.system(size: 13))
-                        }
-                        .tag(language)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(maxWidth: 150)
-                
-                Button(action: {
-                    codingPracticeManager.restartCurrentLanguage()
-                }) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.blue.opacity(0.8))
-                        .frame(width: 20, height: 20)
-                        .background(
-                            Circle()
-                                .fill(Color.blue.opacity(0.1))
-                                .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                        )
-                }
-                .buttonStyle(PlainButtonStyle())
-                .onHover { hovering in
-                    if hovering {
-                        NSCursor.pointingHand.push()
-                    } else {
-                        NSCursor.pop()
-                    }
-                }
-            }
-            .padding(.horizontal)
-            
-            // Enhanced typing display - placeholder for now
+        VStack(spacing: 16) {
+            // Enhanced typing display
             CodingTypingDisplayView()
                 .environmentObject(codingPracticeManager)
                 .environmentObject(keyEventTap)
@@ -77,6 +30,11 @@ struct CodingPracticeView: View {
             }
             keyEventTap.registerTabHandler {
                 codingPracticeManager.processTabKey()
+            }
+            
+            // Start analytics session when view appears
+            if !codingPracticeManager.analyticsManager.isSessionActive {
+                codingPracticeManager.startAnalyticsSession()
             }
         }
     }

@@ -20,10 +20,10 @@ protocol KeyEventTapProtocol: ObservableObject {
     func startMonitoring()
     func stopMonitoring()
     func setCurrentMode(_ mode: MainWindowMode)
-    func registerCodingPracticeHandler(_ handler: @escaping (Character) -> Void)
-    func registerBackspaceHandler(_ handler: @escaping () -> Void)
-    func registerEnterHandler(_ handler: @escaping () -> Void)
-    func registerTabHandler(_ handler: @escaping () -> Void)
+    func registerCodingPracticeHandler(_ handler: ((Character) -> Void)?)
+    func registerBackspaceHandler(_ handler: (() -> Void)?)
+    func registerEnterHandler(_ handler: (() -> Void)?)
+    func registerTabHandler(_ handler: (() -> Void)?)
 }
 
 class KeyEventTap: KeyEventTapProtocol, ObservableObject {
@@ -317,19 +317,19 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
         currentMode.send(mode)
     }
     
-    func registerCodingPracticeHandler(_ handler: @escaping (Character) -> Void) {
+    func registerCodingPracticeHandler(_ handler: ((Character) -> Void)?) {
         codingPracticeCharacterHandler = handler
     }
     
-    func registerBackspaceHandler(_ handler: @escaping () -> Void) {
+    func registerBackspaceHandler(_ handler: (() -> Void)?) {
         backspaceHandler = handler
     }
     
-    func registerEnterHandler(_ handler: @escaping () -> Void) {
+    func registerEnterHandler(_ handler: (() -> Void)?) {
         enterHandler = handler
     }
     
-    func registerTabHandler(_ handler: @escaping () -> Void) {
+    func registerTabHandler(_ handler: (() -> Void)?) {
         tabHandler = handler
     }
 }

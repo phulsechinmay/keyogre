@@ -8,6 +8,7 @@ import Combine
 class CodingPracticeManager: ObservableObject {
     @Published var state = CodingPracticeState()
     private let practiceContent = CodingPracticeContent()
+    @Published var analyticsManager = TypingAnalyticsManager()
     
     func processKeyInput(_ character: Character) {
         state.ensureLanguageProgressExists()
@@ -26,6 +27,10 @@ class CodingPracticeManager: ObservableObject {
         let characterResult = CharacterResult(character: character, isCorrect: isCorrect, timestamp: Date())
         progress.addCharacterResult(characterResult, lineIndex: progress.currentLineIndex)
         
+        // Send to analytics manager
+        let context = getContextAroundCharacter(line: currentLine, index: progress.currentCharIndex)
+        analyticsManager.processCharacterInput(characterResult, expectedCharacter: expectedChar, context: context)
+        
         // Always advance position regardless of correctness
         progress.currentCharIndex += 1
         
@@ -35,6 +40,9 @@ class CodingPracticeManager: ObservableObject {
     func processBackspace() {
         state.ensureLanguageProgressExists()
         var progress = state.getCurrentProgress()
+        
+        // Send to analytics manager
+        analyticsManager.processBackspace()
         
         // Get typed results for current line to verify we have characters to delete
         let lineResult = progress.typedResults.first { $0.lineIndex == progress.currentLineIndex }
@@ -75,12 +83,17 @@ class CodingPracticeManager: ObservableObject {
         
         // Allow enter if we've typed the complete line or if it's an empty line
         if progress.currentCharIndex >= currentLine.count || currentLine.isEmpty {
+            // Send line completion to analytics
+            analyticsManager.processLineCompletion()
+            
             progress.currentLineIndex += 1
             progress.currentCharIndex = 0
             
             // Check if all content is complete
             if progress.currentLineIndex >= currentContent.count {
                 progress.isComplete = true
+                // End analytics session when practice is complete
+                let _ = analyticsManager.endSession()
             }
             
             state.updateCurrentProgress(progress)
@@ -175,11 +188,39 @@ class CodingPracticeManager: ObservableObject {
     }
     
     func restartCurrentLanguage() {
+        // End current analytics session if active
+        if analyticsManager.isSessionActive {
+            let _ = analyticsManager.endSession()
+        }
+        
         state.languageProgress[state.currentLanguage] = LanguageProgress()
+        
+        // Start new analytics session
+        startAnalyticsSession()
     }
     
     func switchLanguage(to language: ProgrammingLanguage) {
+        // End current analytics session if active
+        if analyticsManager.isSessionActive {
+            let _ = analyticsManager.endSession()
+        }
+        
         state.currentLanguage = language
+        
+        // Start new analytics session for the new language
+        startAnalyticsSession()
+    }
+    
+    func startAnalyticsSession() {
+        analyticsManager.startSession(mode: .codingPractice, language: state.currentLanguage)
+    }
+    
+    func pauseAnalytics() {
+        analyticsManager.pauseSession()
+    }
+    
+    func resumeAnalytics() {
+        analyticsManager.resumeSession()
     }
     
     // MARK: - Private Methods
@@ -262,5 +303,16 @@ class CodingPracticeManager: ObservableObject {
             }
         }
         return indentationCount
+    }
+    
+    private func getContextAroundCharacter(line: String, index: Int) -> String {
+        let contextRange = 3 // Characters before and after
+        let startIndex = max(0, index - contextRange)
+        let endIndex = min(line.count, index + contextRange + 1)
+        
+        let start = line.index(line.startIndex, offsetBy: startIndex)
+        let end = line.index(line.startIndex, offsetBy: endIndex)
+        
+        return String(line[start..<end])
     }
 }
