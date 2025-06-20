@@ -8,6 +8,7 @@ import SwiftUI
 enum TypingMode: String, CaseIterable, Codable {
     case freeform = "Freeform"
     case codingPractice = "Coding Practice"
+    case typingPractice = "Typing Practice"
     
     var id: String { rawValue }
 }

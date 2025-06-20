@@ -37,11 +37,13 @@ enum ProgrammingLanguage: String, CaseIterable, Identifiable {
 enum MainWindowMode: String, CaseIterable {
     case freeform = "Freeform"
     case codingPractice = "Coding Practice"
+    case typingPractice = "Typing Practice"
     
     var icon: String {
         switch self {
         case .freeform: return "text.cursor"
         case .codingPractice: return "chevron.left.forwardslash.chevron.right"
+        case .typingPractice: return "keyboard"
         }
     }
 }

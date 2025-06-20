@@ -11,6 +11,7 @@ struct MainContentView: View {
     @StateObject private var keyboardLayoutManager = KeyboardLayoutManager
         .shared
     @StateObject private var codingPracticeManager = CodingPracticeManager()
+    @StateObject private var typingPracticeManager = TypingPracticeManager()
     @State private var analyticsRefreshTimer: Timer?
     @State private var forceAnalyticsRefresh = false
 
@@ -132,11 +133,27 @@ struct MainContentView: View {
             CodingTypingDisplayView()
                 .environmentObject(codingPracticeManager)
                 .environmentObject(keyEventTap)
+        case .typingPractice:
+            // Just the typing practice display for word practice mode
+            TypingPracticeDisplayView()
+                .environmentObject(typingPracticeManager)
+                .environmentObject(keyEventTap)
         }
     }
 
     private func getCodingPracticeManager() -> CodingPracticeManager {
         return codingPracticeManager
+    }
+    
+    private func getCurrentAnalyticsManager() -> TypingAnalyticsManager {
+        switch selectedMode {
+        case .codingPractice:
+            return codingPracticeManager.analyticsManager
+        case .typingPractice:
+            return typingPracticeManager.analyticsManager
+        case .freeform:
+            return codingPracticeManager.analyticsManager // Fallback
+        }
     }
 
     @ViewBuilder
@@ -145,7 +162,7 @@ struct MainContentView: View {
             // Hidden dependency on refresh state to trigger UI updates
             let _ = forceAnalyticsRefresh
             switch selectedMode {
-            case .codingPractice:
+            case .codingPractice, .typingPractice:
                 VStack(spacing: 6) {
                     // WPM with icon - always show
                     VStack(spacing: 2) {
@@ -154,8 +171,7 @@ struct MainContentView: View {
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundColor(getWPMColor())
                             Text(
-                                codingPracticeManager.analyticsManager
-                                    .getFormattedWPM()
+                                getCurrentAnalyticsManager().getFormattedWPM()
                             )
                             .font(
                                 .system(
@@ -184,8 +200,7 @@ struct MainContentView: View {
                                 .font(.system(size: 10, weight: .medium))
                                 .foregroundColor(getAccuracyColor())
                             Text(
-                                codingPracticeManager.analyticsManager
-                                    .getFormattedAccuracy()
+                                getCurrentAnalyticsManager().getFormattedAccuracy()
                             )
                             .font(
                                 .system(
@@ -246,8 +261,7 @@ struct MainContentView: View {
     }
 
     private func getFormattedDuration() -> String {
-        let activeDuration = codingPracticeManager.analyticsManager
-            .currentSessionMetrics.activeDuration
+        let activeDuration = getCurrentAnalyticsManager().currentSessionMetrics.activeDuration
         
         let minutes = Int(activeDuration) / 60
         let seconds = Int(activeDuration) % 60
@@ -255,8 +269,7 @@ struct MainContentView: View {
     }
 
     private func getWPMColor() -> Color {
-        let wpm = codingPracticeManager.analyticsManager.currentSessionMetrics
-            .currentWPM
+        let wpm = getCurrentAnalyticsManager().currentSessionMetrics.currentWPM
         if wpm >= 60 { return .green }
         if wpm >= 40 { return .yellow }
         if wpm >= 20 { return .orange }
@@ -264,8 +277,7 @@ struct MainContentView: View {
     }
 
     private func getAccuracyColor() -> Color {
-        let accuracy = codingPracticeManager.analyticsManager
-            .currentSessionMetrics.accuracy
+        let accuracy = getCurrentAnalyticsManager().currentSessionMetrics.accuracy
         if accuracy >= 95 { return .green }
         if accuracy >= 90 { return .yellow }
         if accuracy >= 80 { return .orange }
@@ -273,7 +285,7 @@ struct MainContentView: View {
     }
     
     private func getSessionStatusText() -> String {
-        let analyticsManager = codingPracticeManager.analyticsManager
+        let analyticsManager = getCurrentAnalyticsManager()
         let hasTypedCharacters = analyticsManager.currentSessionMetrics.charactersTyped > 0
         
         if !hasTypedCharacters {
@@ -286,7 +298,7 @@ struct MainContentView: View {
     }
     
     private func getSessionStatusColor() -> Color {
-        let analyticsManager = codingPracticeManager.analyticsManager
+        let analyticsManager = getCurrentAnalyticsManager()
         let hasTypedCharacters = analyticsManager.currentSessionMetrics.charactersTyped > 0
         
         if !hasTypedCharacters {
@@ -319,6 +331,7 @@ struct MainContentView: View {
             keyEventTap.registerCodingPracticeHandler { character in
                 codingPracticeManager.processKeyInput(character)
             }
+            keyEventTap.registerTypingPracticeHandler(nil) // Clear typing practice handler
             keyEventTap.registerBackspaceHandler {
                 codingPracticeManager.processBackspace()
             }
@@ -334,11 +347,31 @@ struct MainContentView: View {
                 codingPracticeManager.startAnalyticsSession()
             }
 
+        case .typingPractice:
+            // Register typing practice handlers with key event tap
+            keyEventTap.registerTypingPracticeHandler { character in
+                typingPracticeManager.processKeyInput(character)
+            }
+            keyEventTap.registerCodingPracticeHandler(nil) // Clear coding practice handler
+            keyEventTap.registerBackspaceHandler {
+                typingPracticeManager.processBackspace()
+            }
+            keyEventTap.registerEnterHandler {
+                typingPracticeManager.processEnterKey()
+            }
+            keyEventTap.registerTabHandler(nil) // No tab handling for typing practice
+
+            // Start analytics session when switching to typing practice
+            if !typingPracticeManager.analyticsManager.isSessionActive {
+                typingPracticeManager.startAnalyticsSession()
+            }
+
         case .freeform:
-            // Clear coding practice handlers for freeform mode
+            // Clear practice handlers for freeform mode
             let nilCharacterHandler: ((Character) -> Void)? = nil
             let nilVoidHandler: (() -> Void)? = nil
             keyEventTap.registerCodingPracticeHandler(nilCharacterHandler)
+            keyEventTap.registerTypingPracticeHandler(nilCharacterHandler)
             keyEventTap.registerBackspaceHandler(nilVoidHandler)
             keyEventTap.registerEnterHandler(nilVoidHandler)
             keyEventTap.registerTabHandler(nilVoidHandler)

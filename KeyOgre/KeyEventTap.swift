@@ -21,6 +21,7 @@ protocol KeyEventTapProtocol: ObservableObject {
     func stopMonitoring()
     func setCurrentMode(_ mode: MainWindowMode)
     func registerCodingPracticeHandler(_ handler: ((Character) -> Void)?)
+    func registerTypingPracticeHandler(_ handler: ((Character) -> Void)?)
     func registerBackspaceHandler(_ handler: (() -> Void)?)
     func registerEnterHandler(_ handler: (() -> Void)?)
     func registerTabHandler(_ handler: (() -> Void)?)
@@ -41,6 +42,7 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     
     // Coding practice event handlers
     private var codingPracticeCharacterHandler: ((Character) -> Void)?
+    private var typingPracticeCharacterHandler: ((Character) -> Void)?
     private var backspaceHandler: (() -> Void)?
     private var enterHandler: (() -> Void)?
     private var tabHandler: (() -> Void)?
@@ -114,12 +116,12 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             // Publish the updated pressed keys set
             self.pressedKeysSet.send(self.pressedKeys)
             
-            // Handle special keys for coding practice mode
-            if self.currentMode.value == .codingPractice {
+            // Handle special keys for structured modes
+            if self.currentMode.value == .codingPractice || self.currentMode.value == .typingPractice {
                 if keyCode == 51 { // Backspace key
                     self.backspaceHandler?()
                     return
-                } else if keyCode == 48 { // Tab key
+                } else if keyCode == 48 && self.currentMode.value == .codingPractice { // Tab key (only for coding practice)
                     self.tabHandler?()
                     return
                 }
@@ -220,6 +222,13 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
             } else {
                 codingPracticeCharacterHandler?(character)
             }
+        } else if currentModeValue == .typingPractice {
+            // Handle typing practice mode
+            if character == "\r" || character == "\n" {
+                enterHandler?()
+            } else {
+                typingPracticeCharacterHandler?(character)
+            }
         } else {
             // Handle freeform mode (legacy behavior)
             if character == "\r" || character == "\n" {
@@ -319,6 +328,10 @@ class KeyEventTap: KeyEventTapProtocol, ObservableObject {
     
     func registerCodingPracticeHandler(_ handler: ((Character) -> Void)?) {
         codingPracticeCharacterHandler = handler
+    }
+    
+    func registerTypingPracticeHandler(_ handler: ((Character) -> Void)?) {
+        typingPracticeCharacterHandler = handler
     }
     
     func registerBackspaceHandler(_ handler: (() -> Void)?) {
