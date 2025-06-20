@@ -216,21 +216,24 @@ struct CodingTypingDisplayView: View {
                 highlights.append(CharacterHighlight(
                     index: index,
                     state: result.isCorrect ? .correct : .incorrect,
-                    isCurrentChar: false
+                    isCurrentChar: false,
+                    typedCharacter: result.isCorrect ? nil : result.character
                 ))
             } else if index == progress.currentCharIndex {
                 // Current character to type
                 highlights.append(CharacterHighlight(
                     index: index,
                     state: .current,
-                    isCurrentChar: true
+                    isCurrentChar: true,
+                    typedCharacter: nil
                 ))
             } else {
                 // Upcoming character
                 highlights.append(CharacterHighlight(
                     index: index,
                     state: .upcoming,
-                    isCurrentChar: false
+                    isCurrentChar: false,
+                    typedCharacter: nil
                 ))
             }
         }
@@ -247,7 +250,8 @@ struct CodingTypingDisplayView: View {
             CharacterHighlight(
                 index: index,
                 state: result.isCorrect ? .correct : .incorrect,
-                isCurrentChar: false
+                isCurrentChar: false,
+                typedCharacter: result.isCorrect ? nil : result.character
             )
         }
     }

@@ -234,7 +234,8 @@ class TypingPracticeManager: ObservableObject {
             CharacterHighlight(
                 index: index,
                 state: result.isCorrect ? .correct : .incorrect,
-                isCurrentChar: false
+                isCurrentChar: false,
+                typedCharacter: result.isCorrect ? nil : result.character
             )
         }
     }
@@ -249,7 +250,8 @@ class TypingPracticeManager: ObservableObject {
             highlights.append(CharacterHighlight(
                 index: index,
                 state: result.isCorrect ? .correct : .incorrect,
-                isCurrentChar: false
+                isCurrentChar: false,
+                typedCharacter: result.isCorrect ? nil : result.character
             ))
         }
         
@@ -260,7 +262,8 @@ class TypingPracticeManager: ObservableObject {
                 highlights.append(CharacterHighlight(
                     index: state.currentCharIndex,
                     state: .current,
-                    isCurrentChar: true
+                    isCurrentChar: true,
+                    typedCharacter: nil
                 ))
             }
         }

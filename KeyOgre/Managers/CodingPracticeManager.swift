@@ -238,7 +238,8 @@ class CodingPracticeManager: ObservableObject {
             CharacterHighlight(
                 index: index,
                 state: result.isCorrect ? .correct : .incorrect,
-                isCurrentChar: false
+                isCurrentChar: false,
+                typedCharacter: result.isCorrect ? nil : result.character
             )
         }
     }
@@ -254,7 +255,8 @@ class CodingPracticeManager: ObservableObject {
             highlights.append(CharacterHighlight(
                 index: index,
                 state: result.isCorrect ? .correct : .incorrect,
-                isCurrentChar: false
+                isCurrentChar: false,
+                typedCharacter: result.isCorrect ? nil : result.character
             ))
         }
         
@@ -263,7 +265,8 @@ class CodingPracticeManager: ObservableObject {
             highlights.append(CharacterHighlight(
                 index: progress.currentCharIndex,
                 state: .current,
-                isCurrentChar: true
+                isCurrentChar: true,
+                typedCharacter: nil
             ))
         }
         
