@@ -106,7 +106,15 @@ class TypingPracticeContent {
         for i in 0..<count {
             let difficulty = getDifficultyForLine(lineIndex: i, totalLines: count)
             let words = generateWordsForLine(difficulty: difficulty)
-            let line = WordLine(words: words, difficulty: difficulty, lineIndex: i)
+            
+            // Add a space at the end of each line (except the last line)
+            let isLastLine = i == count - 1
+            let line = WordLine(
+                words: words, 
+                difficulty: difficulty, 
+                lineIndex: i,
+                hasTrailingSpace: !isLastLine
+            )
             lines.append(line)
         }
         
@@ -115,10 +123,15 @@ class TypingPracticeContent {
     
     private static func generateHamletLines() -> [WordLine] {
         return hamletLines.enumerated().map { index, lineText in
-            WordLine(
-                words: lineText.components(separatedBy: " "),
-                difficulty: .intermediate, // Hamlet is generally intermediate difficulty
-                lineIndex: index
+            // Add a space at the end of each line (except the last line)
+            let isLastLine = index == hamletLines.count - 1
+            let words = lineText.components(separatedBy: " ")
+            
+            return WordLine(
+                words: words,
+                difficulty: .intermediate,
+                lineIndex: index,
+                hasTrailingSpace: !isLastLine
             )
         }
     }

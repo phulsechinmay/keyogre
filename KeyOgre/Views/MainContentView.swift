@@ -4,7 +4,7 @@
 import SwiftUI
 
 struct MainContentView: View {
-    @State private var selectedMode: MainWindowMode = .codingPractice
+    @State private var selectedMode: MainWindowMode = .typingPractice
     @ObservedObject var keyEventTap: KeyEventTap
     let onClose: () -> Void
     private let theme = ColorTheme.defaultTheme
@@ -19,7 +19,7 @@ struct MainContentView: View {
         self.keyEventTap = keyEventTap
         self.onClose = onClose
         // Set initial mode
-        keyEventTap.setCurrentMode(.codingPractice)
+        keyEventTap.setCurrentMode(.typingPractice)
     }
 
     var body: some View {
@@ -402,7 +402,7 @@ struct MainContentView: View {
         static func createSampleKeyEventTap() -> KeyEventTap {
             let keyEventTap = KeyEventTap()
             // Set up some sample state for preview
-            keyEventTap.setCurrentMode(.codingPractice)
+            keyEventTap.setCurrentMode(.typingPractice)
             return keyEventTap
         }
     }

@@ -32,20 +32,21 @@ extension TypingTextType: PracticeControlOption {}
 
 struct WordLine {
     let words: [String]
-    let fullText: String // Joined with spaces
+    let fullText: String // Joined with spaces, optionally with trailing space
     let difficulty: DifficultyLevel
     let lineIndex: Int
     
-    init(words: [String], difficulty: DifficultyLevel, lineIndex: Int) {
+    init(words: [String], difficulty: DifficultyLevel, lineIndex: Int, hasTrailingSpace: Bool = false) {
         self.words = words
-        self.fullText = words.joined(separator: " ")
+        let joinedText = words.joined(separator: " ")
+        self.fullText = hasTrailingSpace ? joinedText + " " : joinedText
         self.difficulty = difficulty
         self.lineIndex = lineIndex
     }
 }
 
 struct TypingPracticeState {
-    var currentTextType: TypingTextType = .randomWords
+    var currentTextType: TypingTextType = .hamlet
     var currentLineIndex: Int = 0
     var currentCharIndex: Int = 0
     var wordLines: [WordLine] = []
