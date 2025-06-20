@@ -51,7 +51,7 @@ struct MainContentView: View {
                         // Main content based on selected mode
                         contentView
                     }
-                    .frame(maxWidth: 400)
+                    .frame(maxWidth: 450)
 
                     // Compact analytics panel (always visible but content changes)
                     analyticsPanel

@@ -17,7 +17,7 @@ struct SharedTypingDisplayView: View {
     private let theme = ColorTheme.defaultTheme
     
     // Wheel picker constants (matching TypingDisplayView)
-    private let maxLineWidth: CGFloat = 350
+    private let maxLineWidth: CGFloat = 400
     private let lineHeight: CGFloat = 24
     private let cylinderHeight: CGFloat = 140
     private let fontSize: CGFloat = 18

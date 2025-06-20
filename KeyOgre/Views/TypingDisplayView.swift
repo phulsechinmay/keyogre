@@ -11,7 +11,7 @@ struct TypingDisplayView: View {
     @State private var cancellables = Set<AnyCancellable>()
     
     private let theme = ColorTheme.defaultTheme
-    private let maxLineWidth: CGFloat = 350
+    private let maxLineWidth: CGFloat = 400
     private let lineHeight: CGFloat = 24
     private let cylinderHeight: CGFloat = 140 // Increased for 5 lines visibility
     private let lineSpacing: CGFloat = 20  // Equal spacing between all lines
